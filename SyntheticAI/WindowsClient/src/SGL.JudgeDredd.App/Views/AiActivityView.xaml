@@ -1,0 +1,104 @@
+<UserControl x:Class="SGL.JudgeDredd.App.Views.AiActivityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="200"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="AI Activity Monitor" Style="{StaticResource HeadingTextStyle}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Start Monitoring" Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding StartMonitoringCommand}" Padding="16,8" Margin="0,0,8,0"/>
+                <Button Content="Stop" Style="{StaticResource DangerButtonStyle}"
+                        Command="{Binding StopMonitoringCommand}" Padding="16,8"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Status -->
+        <Border Grid.Row="1" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,12">
+            <Grid>
+                <TextBlock Text="{Binding MonitorStatus}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                <TextBlock HorizontalAlignment="Right" FontSize="12" FontWeight="Bold">
+                    <Run Text="AI Processes: " Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <Run Text="{Binding AiProcessesDetected}" Foreground="{StaticResource PrimaryBrush}"/>
+                </TextBlock>
+            </Grid>
+        </Border>
+
+        <!-- Info -->
+        <Border Grid.Row="2" Padding="12,8" Background="{StaticResource SurfaceBrush}"
+                CornerRadius="{StaticResource DefaultCornerRadius}" Margin="0,0,0,16"
+                BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1">
+            <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}">
+                Monitors all AI and LLM activity on this device including ChatGPT, Gemini, GitHub Copilot,
+                Ollama, LM Studio, local LLMs, browser-based AI, code repositories, and file transfer tools.
+                Shows what data each AI process may be accessing, collecting, or transmitting.
+            </TextBlock>
+        </Border>
+
+        <!-- Active AI processes -->
+        <DataGrid Grid.Row="3" ItemsSource="{Binding Activities}"
+                  IsReadOnly="True" CanUserSortColumns="True"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto"
+                  AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Process" Binding="{Binding ProcessName}" Width="130"/>
+                <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="55"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+                <DataGridTextColumn Header="Data Access" Binding="{Binding DataAccessInfo}" Width="*"/>
+                <DataGridTextColumn Header="Memory" Binding="{Binding MemoryUsage}" Width="75"/>
+                <DataGridTextColumn Header="Threads" Binding="{Binding ThreadCount}" Width="60"/>
+                <DataGridTextColumn Header="CPU Time" Binding="{Binding CpuTime}" Width="70"/>
+                <DataGridTextColumn Header="Detected" Binding="{Binding DetectedAt, StringFormat='{}{0:HH:mm:ss}'}" Width="70"/>
+                <DataGridTemplateColumn Header="Action" Width="70">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Kill" Padding="8,2" FontSize="11"
+                                    Style="{StaticResource DangerButtonStyle}"
+                                    Command="{Binding DataContext.KillProcessCommand,
+                                        RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Activity log header -->
+        <Grid Grid.Row="4" Margin="0,12,0,8">
+            <TextBlock Text="Activity Log" Style="{StaticResource SubheadingTextStyle}"/>
+            <Button Content="Clear Log" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding ClearLogCommand}" HorizontalAlignment="Right"
+                    Padding="12,4" FontSize="11"/>
+        </Grid>
+
+        <!-- Activity log -->
+        <DataGrid Grid.Row="5" ItemsSource="{Binding ActivityLog}"
+                  IsReadOnly="True" CanUserSortColumns="True"
+                  VerticalScrollBarVisibility="Auto"
+                  AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Time" Binding="{Binding DetectedAt, StringFormat='{}{0:HH:mm:ss}'}" Width="70"/>
+                <DataGridTextColumn Header="Process" Binding="{Binding ProcessName}" Width="130"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+                <DataGridTextColumn Header="Data Access" Binding="{Binding DataAccessInfo}" Width="*"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="70"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

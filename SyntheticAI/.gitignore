@@ -1,0 +1,32 @@
+# Build outputs
+bin/
+obj/
+publish/
+*.exe
+*.dll
+*.pdb
+*.apk
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.userprefs
+
+# Dependencies
+node_modules/
+dist/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Secrets
+*.env
+appsettings.Development.json
+credentials.json
+
+# LLM Models (too large for git)
+*.gguf
+*.bin

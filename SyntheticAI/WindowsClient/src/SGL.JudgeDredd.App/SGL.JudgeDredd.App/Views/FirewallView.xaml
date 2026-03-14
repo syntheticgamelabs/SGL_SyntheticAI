@@ -1,0 +1,117 @@
+<UserControl x:Class="SGL.JudgeDredd.App.Views.FirewallView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:SGL.JudgeDredd.Shared.Localization;assembly=SGL.JudgeDredd.Shared"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="200"/>
+        </Grid.RowDefinitions>
+
+        <!-- Page title -->
+        <TextBlock Grid.Row="0" Text="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.title]}"
+                   Style="{StaticResource HeadingTextStyle}"
+                   Margin="0,0,0,20"/>
+
+        <!-- Preset toggle buttons -->
+        <Border Grid.Row="1" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.quickPresets]}"
+                           Style="{StaticResource SubheadingTextStyle}"
+                           Margin="0,0,0,12"/>
+                <WrapPanel>
+                    <ToggleButton Content="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.gamingMode]}"
+                                  IsChecked="{Binding IsGamingMode}"
+                                  Command="{Binding ToggleGamingCommand}"
+                                  Margin="0,0,12,0"/>
+                    <ToggleButton Content="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.streamingMode]}"
+                                  IsChecked="{Binding IsStreamingMode}"
+                                  Command="{Binding ToggleStreamingCommand}"
+                                  Margin="0,0,12,0"/>
+                    <ToggleButton Content="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.lockdownMode]}"
+                                  IsChecked="{Binding IsLockdownMode}"
+                                  Command="{Binding ToggleLockdownCommand}"/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Rules DataGrid -->
+        <Grid Grid.Row="2" Margin="0,0,0,16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,0,0,8">
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.rules]}"
+                           Style="{StaticResource SubheadingTextStyle}"
+                           VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.addRule]}"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding AddRuleCommand}"
+                            Padding="12,6" FontSize="12"
+                            Margin="0,0,8,0"/>
+                    <Button Content="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.removeRule]}"
+                            Style="{StaticResource DangerButtonStyle}"
+                            Command="{Binding RemoveRuleCommand}"
+                            CommandParameter="{Binding SelectedItem, ElementName=RulesGrid}"
+                            Padding="12,6" FontSize="12"/>
+                </StackPanel>
+            </Grid>
+
+            <DataGrid Grid.Row="1"
+                      x:Name="RulesGrid"
+                      ItemsSource="{Binding Rules}"
+                      IsReadOnly="True"
+                      VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[common.name]}" Binding="{Binding Name}" Width="160"/>
+                    <DataGridTextColumn Header="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[common.actions]}" Binding="{Binding Action}" Width="80"/>
+                    <DataGridTextColumn Header="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.direction]}" Binding="{Binding Direction}" Width="90"/>
+                    <DataGridTextColumn Header="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.protocol]}" Binding="{Binding Protocol}" Width="80"/>
+                    <DataGridTextColumn Header="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.localPorts]}" Binding="{Binding LocalPorts}" Width="100"/>
+                    <DataGridTextColumn Header="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.remoteAddr]}" Binding="{Binding RemoteAddresses}" Width="*"/>
+                    <DataGridCheckBoxColumn Header="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.enabled]}" Binding="{Binding Enabled}" Width="70"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- Connections section label -->
+        <Grid Grid.Row="3" Margin="0,0,0,8">
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[firewall.activeConnections]}"
+                       Style="{StaticResource SubheadingTextStyle}"
+                       VerticalAlignment="Center"/>
+            <Button Content="{Binding Source={x:Static loc:LocalizationService.Instance}, Path=[common.refresh]}"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding RefreshConnectionsCommand}"
+                    HorizontalAlignment="Right"
+                    Padding="12,4" FontSize="12"/>
+        </Grid>
+
+        <!-- Connections DataGrid -->
+        <DataGrid Grid.Row="4"
+                  ItemsSource="{Binding Connections}"
+                  IsReadOnly="True"
+                  VerticalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Local" Binding="{Binding LocalAddress}" Width="120"/>
+                <DataGridTextColumn Header="Port" Binding="{Binding LocalPort}" Width="60"/>
+                <DataGridTextColumn Header="Remote" Binding="{Binding RemoteAddress}" Width="120"/>
+                <DataGridTextColumn Header="Port" Binding="{Binding RemotePort}" Width="60"/>
+                <DataGridTextColumn Header="Protocol" Binding="{Binding Protocol}" Width="70"/>
+                <DataGridTextColumn Header="State" Binding="{Binding State}" Width="100"/>
+                <DataGridTextColumn Header="Process" Binding="{Binding ProcessName}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

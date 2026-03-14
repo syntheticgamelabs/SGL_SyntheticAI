@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>SGL.JudgeDredd.App</RootNamespace>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- Allow duplicate native DLLs from LLamaSharp backends (avx, avx2, avx512 variants) -->
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Cover.png" />
+    <Resource Include="Assets\Scan.png" />
+    <Resource Include="Assets\Icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="app.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.12" />
+    <PackageReference Include="MailKit" Version="4.9.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SGL.JudgeDredd.Core\SGL.JudgeDredd.Core.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Shared\SGL.JudgeDredd.Shared.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.KnowledgeBase\SGL.JudgeDredd.KnowledgeBase.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.LLM\SGL.JudgeDredd.LLM.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Antivirus\SGL.JudgeDredd.Antivirus.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Firewall\SGL.JudgeDredd.Firewall.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Security\SGL.JudgeDredd.Security.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Api.Contracts\SGL.JudgeDredd.Api.Contracts.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Server\SGL.JudgeDredd.Server.csproj" />
+  </ItemGroup>
+
+</Project>

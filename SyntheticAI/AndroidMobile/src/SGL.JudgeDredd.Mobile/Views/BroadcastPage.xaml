@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SGL.JudgeDredd.Mobile.ViewModels"
+             xmlns:models="clr-namespace:SGL.JudgeDredd.Mobile.Models"
+             x:Class="SGL.JudgeDredd.Mobile.Views.BroadcastPage"
+             x:DataType="vm:BroadcastViewModel"
+             BackgroundColor="{StaticResource BackgroundColor}"
+             Title="Broadcast">
+    <ScrollView>
+        <VerticalStackLayout Spacing="10" Padding="16">
+
+            <!-- Neon Title -->
+            <Label Text="BROADCAST" Style="{StaticResource NeonTitleLabel}" Margin="0,4,0,0"/>
+
+            <!-- Status Bar -->
+            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,4">
+                <Label Text="{Binding StatusText}" TextColor="{StaticResource TextMutedColor}" FontSize="11"
+                       VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+                <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center" Margin="8,0">
+                    <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4"
+                             Color="{StaticResource GreenColor}"/>
+                    <Label Text="{Binding ConnectionStatus}" TextColor="{StaticResource TextMutedColor}" FontSize="11"/>
+                </HorizontalStackLayout>
+                <ActivityIndicator Grid.Column="2" IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                                   Color="{StaticResource AccentColor}" HeightRequest="16" WidthRequest="16"/>
+            </Grid>
+
+            <!-- ═══ BROADCAST BOARD ═══ -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}" CornerRadius="12" Padding="12"
+                   BorderColor="Transparent" HasShadow="False">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Broadcast Board" TextColor="{StaticResource AccentColor}"
+                               FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Button Grid.Column="1" Text="Clear" FontSize="11" HeightRequest="28" Padding="10,0"
+                                BackgroundColor="{StaticResource SurfaceLightColor}" TextColor="{StaticResource TextColor}"
+                                Command="{Binding ClearMessagesCommand}"/>
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding Messages}" HeightRequest="200"
+                                    ItemsUpdatingScrollMode="KeepScrollOffset">
+                        <CollectionView.EmptyView>
+                            <Label Text="No broadcast messages yet. Send one below."
+                                   TextColor="{StaticResource TextMutedColor}" FontSize="13"
+                                   HorizontalTextAlignment="Center" Margin="0,40,0,0"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:BroadcastMessageItem">
+                                <Frame Padding="10" Margin="0,2" CornerRadius="8" BorderColor="Transparent"
+                                       HasShadow="False" BackgroundColor="{StaticResource CardColor}">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Label Text="{Binding Username}" FontSize="12" FontAttributes="Bold"
+                                                   TextColor="{StaticResource AccentColor}"/>
+                                            <Label Grid.Column="1" Text="ADMIN" FontSize="9"
+                                                   TextColor="{StaticResource YellowColor}" FontAttributes="Bold"
+                                                   IsVisible="{Binding IsAdmin}" Margin="6,0,0,0"
+                                                   VerticalOptions="Center"/>
+                                            <Label Grid.Column="2" Text="{Binding TimeDisplay}"
+                                                   TextColor="{StaticResource TextMutedColor}" FontSize="10"/>
+                                        </Grid>
+                                        <Label Text="{Binding Message}" TextColor="{StaticResource TextColor}"
+                                               FontSize="13" LineBreakMode="WordWrap"/>
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Broadcast Input -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Text="{Binding BroadcastInput}" Placeholder="Type a broadcast..."
+                               PlaceholderColor="{StaticResource TextMutedColor}"
+                               TextColor="{StaticResource TextColor}"
+                               BackgroundColor="{StaticResource SurfaceLightColor}"
+                               ReturnCommand="{Binding SendBroadcastMessageCommand}" FontSize="14"/>
+                        <Button Grid.Column="1" Text="Send" Command="{Binding SendBroadcastMessageCommand}"
+                                BackgroundColor="{StaticResource AccentColor}" TextColor="#1A1610"
+                                HeightRequest="40" WidthRequest="70" FontSize="13" FontAttributes="Bold"
+                                IsEnabled="{Binding IsSending, Converter={StaticResource InvertedBoolConverter}}"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- ═══ CHAT SECTION ═══ -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}" CornerRadius="12" Padding="12"
+                   BorderColor="Transparent" HasShadow="False">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Chat Messages" TextColor="{StaticResource AccentColor}"
+                               FontSize="16" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Button Grid.Column="1" Text="Clear" FontSize="11" HeightRequest="28" Padding="10,0"
+                                BackgroundColor="{StaticResource SurfaceLightColor}" TextColor="{StaticResource TextColor}"
+                                Command="{Binding ClearChatCommand}"/>
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding ChatMessages}" HeightRequest="200"
+                                    ItemsUpdatingScrollMode="KeepLastItemInView">
+                        <CollectionView.EmptyView>
+                            <Label Text="No chat messages yet. Start a conversation!"
+                                   TextColor="{StaticResource TextMutedColor}" FontSize="13"
+                                   HorizontalTextAlignment="Center" Margin="0,40,0,0"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:ChatMessageItem">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Padding="4,3">
+                                    <Label Text="{Binding Sender}" TextColor="{StaticResource AccentColor}"
+                                           FontSize="12" FontAttributes="Bold" VerticalOptions="Start"/>
+                                    <Label Grid.Column="1" Text="{Binding Text}"
+                                           TextColor="{StaticResource TextColor}"
+                                           FontSize="13" LineBreakMode="WordWrap"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Chat Input -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Text="{Binding ChatMessageText}" Placeholder="Type a chat message..."
+                               PlaceholderColor="{StaticResource TextMutedColor}"
+                               TextColor="{StaticResource TextColor}"
+                               BackgroundColor="{StaticResource BackgroundColor}"
+                               ReturnCommand="{Binding SendChatMessageCommand}" FontSize="14"/>
+                        <Button Grid.Column="1" Text="Send" Command="{Binding SendChatMessageCommand}"
+                                BackgroundColor="{StaticResource AccentColor}" TextColor="#1A1610"
+                                HeightRequest="40" WidthRequest="70" FontSize="13" FontAttributes="Bold"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

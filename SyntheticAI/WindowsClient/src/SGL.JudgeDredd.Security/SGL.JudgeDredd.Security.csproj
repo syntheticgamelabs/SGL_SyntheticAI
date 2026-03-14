@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SGL.JudgeDredd.Security</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SGL.JudgeDredd.Core\SGL.JudgeDredd.Core.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Shared\SGL.JudgeDredd.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

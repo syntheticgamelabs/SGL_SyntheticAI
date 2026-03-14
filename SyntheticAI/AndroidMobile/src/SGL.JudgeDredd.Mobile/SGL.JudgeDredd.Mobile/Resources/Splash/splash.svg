@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1E1E2E"/>
+  <!-- Shield shape -->
+  <path d="M256 80 L420 160 L420 290 C420 380 345 440 256 460 C167 440 92 380 92 290 L92 160 Z"
+        fill="#89B4FA" opacity="0.3" stroke="none"/>
+  <!-- JD text -->
+  <text x="256" y="310" font-family="Arial" font-size="140" font-weight="bold"
+        text-anchor="middle" fill="#89B4FA">JD</text>
+</svg>

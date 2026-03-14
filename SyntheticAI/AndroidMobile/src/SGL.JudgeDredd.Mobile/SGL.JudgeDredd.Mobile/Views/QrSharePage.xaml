@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SGL.JudgeDredd.Mobile.ViewModels"
+             x:Class="SGL.JudgeDredd.Mobile.Views.QrSharePage"
+             x:DataType="vm:QrShareViewModel"
+             BackgroundColor="{StaticResource BackgroundColor}"
+             Title="Share">
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="12">
+            <Label Text="QR SHARE" Style="{StaticResource NeonTitleLabel}" Margin="0,4,0,0"/>
+            <Label Text="{Binding StatusText}" TextColor="{StaticResource TextMutedColor}" FontSize="13"/>
+
+            <!-- Share Type Picker -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}" CornerRadius="8" Padding="12" BorderColor="Transparent">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="What to Share" TextColor="{StaticResource TextColor}" FontAttributes="Bold"/>
+                    <Picker SelectedItem="{Binding SelectedShareType}" TextColor="{StaticResource TextColor}"
+                            BackgroundColor="{StaticResource SurfaceLightColor}">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>Mobile APK</x:String>
+                                <x:String>Desktop Client</x:String>
+                                <x:String>Linux Client</x:String>
+                                <x:String>Server Info</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+                    <Button Text="Generate QR Code" Command="{Binding GenerateQrCommand}"
+                            IsEnabled="{Binding IsGenerating, Converter={StaticResource InvertedBoolConverter}}"
+                            Style="{StaticResource PrimaryButton}" HeightRequest="44"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- QR Code Display -->
+            <Frame BackgroundColor="White" CornerRadius="12" Padding="20"
+                   IsVisible="{Binding HasQrCode}" HorizontalOptions="Center"
+                   BorderColor="Transparent" WidthRequest="280" HeightRequest="280">
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <Image Source="{Binding QrImageSource}" WidthRequest="240" HeightRequest="240"/>
+                    <Label Text="Scan with any QR reader" TextColor="#1A1610" FontSize="11"
+                           HorizontalOptions="Center" Margin="0,8,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Share URL -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}" CornerRadius="8" Padding="12"
+                   IsVisible="{Binding HasQrCode}" BorderColor="Transparent">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Download Link" TextColor="{StaticResource AccentColor}" FontAttributes="Bold"/>
+                    <Label Text="{Binding ShareUrl}" TextColor="{StaticResource TextColor}" FontSize="12"
+                           FontFamily="monospace"/>
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="Share Link" Command="{Binding ShareLinkCommand}"
+                                BackgroundColor="{StaticResource AccentColor}" TextColor="#1A1610"
+                                HeightRequest="38" FontSize="13"/>
+                        <Button Text="Copy Link" Command="{Binding CopyLinkCommand}"
+                                BackgroundColor="{StaticResource SurfaceLightColor}" TextColor="{StaticResource TextColor}"
+                                HeightRequest="38" FontSize="13"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

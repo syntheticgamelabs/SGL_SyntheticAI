@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:SGL.JudgeDredd.Mobile.Views"
+       x:Class="SGL.JudgeDredd.Mobile.AppShell"
+       Title="SGL SyntheticAI"
+       FlyoutBehavior="Flyout"
+       FlyoutBackgroundColor="{StaticResource SurfaceColor}"
+       Shell.BackgroundColor="{StaticResource SurfaceColor}"
+       Shell.ForegroundColor="{StaticResource TextColor}"
+       Shell.TabBarBackgroundColor="{StaticResource SurfaceColor}"
+       Shell.TabBarForegroundColor="{StaticResource AccentColor}"
+       Shell.TabBarUnselectedColor="{StaticResource TextMutedColor}">
+
+    <!-- Flyout Header -->
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="{StaticResource BackgroundColor}"
+              Padding="20,40,20,20" HeightRequest="160">
+            <VerticalStackLayout VerticalOptions="End" Spacing="4">
+                <Image Source="logo.png"
+                       HeightRequest="60"
+                       WidthRequest="60"
+                       HorizontalOptions="Start"
+                       Aspect="AspectFit" />
+                <Label Text="SGL SyntheticAI"
+                       TextColor="{StaticResource AccentColor}"
+                       FontSize="22"
+                       FontAttributes="Bold" />
+                <Label Text="AI Security Suite"
+                       TextColor="{StaticResource TextMutedColor}"
+                       FontSize="14" />
+                <Label Text="ABV 1.1.38"
+                       TextColor="{StaticResource TextMutedColor}"
+                       FontSize="11" />
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <!-- Main Navigation -->
+    <FlyoutItem Title="Dashboard"
+                Icon="{OnPlatform Android='icon_dashboard.png'}">
+        <ShellContent ContentTemplate="{DataTemplate views:DashboardPage}"
+                      Route="dashboard" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Scanner"
+                Icon="{OnPlatform Android='icon_scanner.png'}">
+        <ShellContent ContentTemplate="{DataTemplate views:ScanPage}"
+                      Route="scanner" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="AI Chat"
+                Icon="{OnPlatform Android='icon_chat.png'}">
+        <ShellContent ContentTemplate="{DataTemplate views:ChatPage}"
+                      Route="chat" />
+    </FlyoutItem>
+
+    <!-- Security Tools -->
+    <FlyoutItem Title="Bluetooth"
+                FlyoutItemIsVisible="True">
+        <ShellContent ContentTemplate="{DataTemplate views:BluetoothPage}"
+                      Route="bluetooth" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="WiFi Scanner"
+                FlyoutItemIsVisible="True">
+        <ShellContent ContentTemplate="{DataTemplate views:WifiScannerPage}"
+                      Route="wifi" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Telemetry"
+                FlyoutItemIsVisible="True">
+        <ShellContent ContentTemplate="{DataTemplate views:TelemetryPage}"
+                      Route="telemetry" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Device Protection"
+                FlyoutItemIsVisible="True">
+        <ShellContent ContentTemplate="{DataTemplate views:DeviceProtectionPage}"
+                      Route="protection" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Broadcast"
+                FlyoutItemIsVisible="True">
+        <ShellContent ContentTemplate="{DataTemplate views:BroadcastPage}"
+                      Route="broadcast" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="QR Share"
+                FlyoutItemIsVisible="True">
+        <ShellContent ContentTemplate="{DataTemplate views:QrSharePage}"
+                      Route="qrshare" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Git"
+                FlyoutItemIsVisible="True">
+        <ShellContent ContentTemplate="{DataTemplate views:GitPage}"
+                      Route="git" />
+    </FlyoutItem>
+
+    <!-- Settings at bottom -->
+    <FlyoutItem Title="Settings"
+                Icon="{OnPlatform Android='icon_settings.png'}">
+        <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}"
+                      Route="settings" />
+    </FlyoutItem>
+
+</Shell>

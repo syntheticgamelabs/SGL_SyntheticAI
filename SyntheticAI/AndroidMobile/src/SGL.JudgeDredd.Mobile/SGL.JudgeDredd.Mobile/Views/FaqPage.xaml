@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SGL.JudgeDredd.Mobile.ViewModels"
+             x:Class="SGL.JudgeDredd.Mobile.Views.FaqPage"
+             x:DataType="vm:FaqViewModel"
+             Title="FAQ"
+             BackgroundColor="{StaticResource BackgroundColor}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16" RowSpacing="12">
+        <!-- Header -->
+        <Label Grid.Row="0"
+               Text="Frequently Asked Questions"
+               TextColor="{StaticResource AccentColor}"
+               FontSize="22"
+               FontAttributes="Bold" />
+
+        <!-- Ask Question Section -->
+        <Frame Grid.Row="1"
+               BackgroundColor="{StaticResource SurfaceColor}"
+               BorderColor="Transparent"
+               CornerRadius="12"
+               Padding="12">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="8">
+                <Editor Grid.Row="0" Grid.ColumnSpan="2"
+                        Text="{Binding QuestionText}"
+                        Placeholder="Type your question here..."
+                        PlaceholderColor="{StaticResource TextMutedColor}"
+                        TextColor="{StaticResource TextColor}"
+                        BackgroundColor="{StaticResource BackgroundColor}"
+                        HeightRequest="80"
+                        AutoSize="TextChanges" />
+                <Button Grid.Row="1" Grid.Column="1"
+                        Text="Ask"
+                        Command="{Binding AskQuestionCommand}"
+                        BackgroundColor="{StaticResource AccentColor}"
+                        TextColor="{StaticResource BackgroundColor}"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        Padding="20,8" />
+            </Grid>
+        </Frame>
+
+        <!-- FAQ List -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding FaqItems}">
+            <CollectionView.EmptyView>
+                <Label Text="No FAQ entries yet. Ask a question to get started!"
+                       TextColor="{StaticResource TextMutedColor}"
+                       HorizontalTextAlignment="Center"
+                       VerticalOptions="Center"
+                       Margin="0,40,0,0" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:FaqItem">
+                    <Frame BackgroundColor="{StaticResource SurfaceColor}"
+                           BorderColor="Transparent"
+                           CornerRadius="10"
+                           Padding="12"
+                           Margin="0,4">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding Question}"
+                                   TextColor="{StaticResource AccentColor}"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding Answer, StringFormat='A: {0}'}"
+                                   TextColor="{StaticResource TextColor}"
+                                   FontSize="14"
+                                   IsVisible="False">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsAnswered}" Value="True">
+                                        <Setter Property="IsVisible" Value="True" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Label Text="Awaiting answer..."
+                                   TextColor="{StaticResource TextMutedColor}"
+                                   FontSize="13"
+                                   FontAttributes="Italic">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsAnswered}" Value="True">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Label TextColor="{StaticResource TextMutedColor}"
+                                   FontSize="11">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Asked by " />
+                                        <Span Text="{Binding AskedBy}" FontAttributes="Bold" />
+                                        <Span Text="{Binding AskedAt, StringFormat=' on {0:MMM dd, yyyy}'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Status -->
+        <Label Grid.Row="3"
+               Text="{Binding StatusMessage}"
+               TextColor="{StaticResource TextMutedColor}"
+               FontSize="12"
+               HorizontalTextAlignment="Center" />
+    </Grid>
+</ContentPage>

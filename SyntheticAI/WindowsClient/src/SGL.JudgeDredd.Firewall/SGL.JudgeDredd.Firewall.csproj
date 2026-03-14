@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SGL.JudgeDredd.Firewall</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SGL.JudgeDredd.Core\SGL.JudgeDredd.Core.csproj" />
+    <ProjectReference Include="..\SGL.JudgeDredd.Shared\SGL.JudgeDredd.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

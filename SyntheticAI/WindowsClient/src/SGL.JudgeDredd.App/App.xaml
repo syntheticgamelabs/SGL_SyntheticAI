@@ -1,0 +1,16 @@
+<Application x:Class="SGL.JudgeDredd.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:SGL.JudgeDredd.App.Converters"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/DarkTheme.xaml"/>
+                <ResourceDictionary Source="Styles/RetroStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

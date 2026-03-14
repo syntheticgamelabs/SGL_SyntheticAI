@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456 456">
+  <!-- Shield shape for SyntheticAI -->
+  <path d="M228 60 L380 130 L380 260 C380 340 310 400 228 420 C146 400 76 340 76 260 L76 130 Z"
+        fill="#89B4FA" stroke="none"/>
+  <!-- Inner shield -->
+  <path d="M228 100 L350 155 L350 255 C350 320 290 370 228 385 C166 370 106 320 106 255 L106 155 Z"
+        fill="#1E1E2E" stroke="none"/>
+  <!-- JD text -->
+  <text x="228" y="280" font-family="Arial" font-size="100" font-weight="bold"
+        text-anchor="middle" fill="#89B4FA">JD</text>
+</svg>

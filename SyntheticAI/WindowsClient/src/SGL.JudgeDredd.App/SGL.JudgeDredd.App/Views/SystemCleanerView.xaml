@@ -1,0 +1,303 @@
+<UserControl x:Class="SGL.JudgeDredd.App.Views.SystemCleanerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="900"
+             Background="{StaticResource BackgroundBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="System Cleaner"
+                       Style="{StaticResource HeadingTextStyle}"/>
+            <TextBlock Text="Remove cookies, trackers, cache and temporary files"
+                       Style="{StaticResource SecondaryTextStyle}"
+                       FontSize="14" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- CATEGORY CHECKBOXES -->
+        <Border Grid.Row="1" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Categories"
+                           Style="{StaticResource SubheadingTextStyle}"
+                           Margin="0,0,0,12"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Browser Cookies -->
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding BrowserCookiesSelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Browser Cookies" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Remove tracking cookies from all browsers" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding BrowserCookiesSizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Browser Cache -->
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding BrowserCacheSelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Browser Cache" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Clear cached web data" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding BrowserCacheSizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Browser History -->
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding BrowserHistorySelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Browser History" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Clear browsing history and trackers" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding BrowserHistorySizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Windows Temp Files -->
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding WindowsTempSelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Windows Temp Files" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Remove temporary files" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding WindowsTempSizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Prefetch Files -->
+                    <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding PrefetchSelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Prefetch Files" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Clear Windows prefetch data" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding PrefetchSizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Thumbnail Cache -->
+                    <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding ThumbnailCacheSelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Thumbnail Cache" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Remove cached thumbnails" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding ThumbnailCacheSizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Recent Files List -->
+                    <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding RecentFilesSelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Recent Files List" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Clear recently opened files list" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding RecentFilesSizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Error Reports -->
+                    <Border Grid.Row="3" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding ErrorReportsSelected}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                <TextBlock Text="Error Reports" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Remove Windows Error Reporting data" Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding ErrorReportsSizeDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- ACTION BAR -->
+        <Border Grid.Row="2" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Total cleanable: " Style="{StaticResource SecondaryTextStyle}" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding TotalCleanableDisplay}" Foreground="{StaticResource AccentBrush}" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button Grid.Column="1" Content="Analyze" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AnalyzeCommand}" Margin="0,0,8,0"/>
+                <Button Grid.Column="2" Content="Clean Now" Style="{StaticResource DangerButtonStyle}" Command="{Binding CleanNowCommand}"/>
+            </Grid>
+        </Border>
+
+        <!-- PROGRESS SECTION -->
+        <Border Grid.Row="3" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16"
+                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding CurrentOperation}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="1" Foreground="{StaticResource SecondaryBrush}" FontSize="12">
+                        <TextBlock.Text>
+                            <Binding Path="ProgressPercent" StringFormat="{}{0:F1}%"/>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+                <ProgressBar Value="{Binding ProgressPercent}" Maximum="100" Height="10" Foreground="{StaticResource PrimaryBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- RESULTS SUMMARY -->
+        <Border Grid.Row="4" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16"
+                Visibility="{Binding HasResults, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+            <StackPanel>
+                <TextBlock Text="Cleaning Results" Style="{StaticResource SubheadingTextStyle}" Margin="0,0,0,12"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="Space Freed" Style="{StaticResource SecondaryTextStyle}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding BytesFreedDisplay}" Foreground="{StaticResource SuccessBrush}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="4,0,4,0">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="Files Deleted" Style="{StaticResource SecondaryTextStyle}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding FilesDeleted}" Foreground="{StaticResource SecondaryBrush}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,0">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="Errors" Style="{StaticResource SecondaryTextStyle}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding FilesFailed}" Foreground="{StaticResource DangerBrush}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- DETAILS LIST -->
+        <TextBlock Grid.Row="5" Text="Details" Style="{StaticResource SubheadingTextStyle}" Margin="0,0,0,8"
+                   Visibility="{Binding HasResults, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+
+        <ItemsControl Grid.Row="6" ItemsSource="{Binding Details}"
+                      Visibility="{Binding HasResults, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,4" Padding="8,6">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Grid.Column="0" Width="6" Height="6" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="1" Text="{Binding}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" TextWrapping="Wrap"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- AI MEMORY WIPE -->
+        <Border Grid.Row="7" Style="{StaticResource SurfaceBorderStyle}" Margin="0,16,0,0" Padding="20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="AI Memory" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="14"/>
+                    <TextBlock Text="Wipe all stored AI conversation memories (/remember data)" Style="{StaticResource SecondaryTextStyle}" FontSize="12" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="Wipe AI Memory" Style="{StaticResource DangerButtonStyle}" Command="{Binding WipeLlmMemoryCommand}" Padding="16,8" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+    </ScrollViewer>
+</UserControl>

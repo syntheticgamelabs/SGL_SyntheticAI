@@ -1,0 +1,472 @@
+<UserControl x:Class="SGL.JudgeDredd.App.Views.EmailScanView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000"
+             Background="{StaticResource BackgroundBrush}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header: Title, Status dot, Toggle, Scan button -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Email Scan" Style="{StaticResource HeadingTextStyle}"
+                       VerticalAlignment="Center"/>
+
+            <!-- Status indicator dot -->
+            <Ellipse Grid.Column="1" Width="12" Height="12" Margin="12,0,0,0"
+                     VerticalAlignment="Center">
+                <Ellipse.Style>
+                    <Style TargetType="Ellipse">
+                        <Setter Property="Fill" Value="#FF1744"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding RealtimeProtectionEnabled}" Value="True">
+                                <Setter Property="Fill" Value="#00E676"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Ellipse.Style>
+            </Ellipse>
+
+            <!-- Real-time protection toggle -->
+            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                <TextBlock Text="Real-time Protection" Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <CheckBox IsChecked="{Binding RealtimeProtectionEnabled}" Content=""
+                          VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Scan Now button -->
+            <Button Grid.Column="4" Content="Scan Now" Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding ScanNowCommand}" Padding="16,8" Margin="0,0,8,0"/>
+
+            <!-- Refresh button -->
+            <Button Grid.Column="5" Content="Reset" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding RefreshCommand}" Padding="16,8"/>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="1" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16">
+            <Grid>
+                <TextBlock Text="{Binding ScanStatus}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock FontSize="12" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}"
+                               Foreground="{StaticResource SecondaryBrush}" Margin="0,0,8,0"
+                               FontWeight="SemiBold">Scanning...</TextBlock>
+                    <TextBlock FontSize="12" FontWeight="Bold">
+                        <Run Text="Threats: " Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <Run Text="{Binding ThreatsDetected}" Foreground="{StaticResource DangerBrush}"/>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Stats cards row -->
+        <UniformGrid Grid.Row="2" Rows="1" Columns="4" Margin="0,0,0,16">
+            <!-- Total Scanned -->
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,6,0">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Total Scanned" Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding TotalEmailsScanned}" Foreground="{StaticResource SecondaryBrush}"
+                               FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Threats Found -->
+            <Border Style="{StaticResource CardBorderStyle}" Margin="3,0">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Threats Found" Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding ThreatsDetected}" Foreground="{StaticResource DangerBrush}"
+                               FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Phishing Blocked -->
+            <Border Style="{StaticResource CardBorderStyle}" Margin="3,0">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Phishing Blocked" Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding PhishingBlocked}" Foreground="{StaticResource WarningBrush}"
+                               FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Malware Blocked -->
+            <Border Style="{StaticResource CardBorderStyle}" Margin="6,0,0,0">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Malware Blocked" Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding MalwareBlocked}" Foreground="{StaticResource PrimaryBrush}"
+                               FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Info card -->
+        <Border Grid.Row="3" Padding="12,8" Background="{StaticResource SurfaceBrush}"
+                CornerRadius="{StaticResource DefaultCornerRadius}" Margin="0,0,0,16"
+                BorderBrush="{StaticResource WarningBrush}" BorderThickness="1">
+            <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}">
+                Email Scan monitors your email clients (Outlook, Thunderbird, Webmail) for phishing URLs,
+                suspicious attachments (.exe, .scr, .vbs, .js, .bat, .cmd, .ps1, .wsf, .msi, .jar), and
+                known malicious senders. Enable real-time protection for continuous monitoring or click
+                Scan Now for an immediate check.
+            </TextBlock>
+        </Border>
+
+        <!-- Browser Email Scanning -->
+        <Border Grid.Row="4" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="Browser Email Scanning" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <Ellipse Width="8" Height="8" Margin="8,0,0,0" VerticalAlignment="Center">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="{StaticResource DangerBrush}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding BrowserEmailScanEnabled}" Value="True">
+                                            <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                    </StackPanel>
+                    <TextBlock Text="{Binding DetectedBrowserEmails}" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource TextSecondaryBrush}" MaxWidth="500"
+                               HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
+                    <TextBlock Text="Scan Browser Emails" Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <CheckBox IsChecked="{Binding BrowserEmailScanEnabled}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button Grid.Column="2" Content="Scan Browser" Style="{StaticResource SecondaryButtonStyle}"
+                        Command="{Binding ScanBrowserEmailCommand}" Padding="12,6" FontSize="11"
+                        VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- IMAP Configuration -->
+        <Border Grid.Row="5" Style="{StaticResource SurfaceBorderStyle}" Margin="0,0,0,16">
+            <StackPanel>
+                <!-- Section header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="IMAP Configuration" FontSize="14" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <Ellipse Width="8" Height="8" Margin="8,0,0,0" VerticalAlignment="Center">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource DangerBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsImapConfigured}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                </StackPanel>
+
+                <!-- Configuration fields -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Host -->
+                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,8,8">
+                        <TextBlock Text="IMAP Host" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding ImapHost, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="12" Padding="8,6"
+                                 Background="{StaticResource CardBrush}"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 BorderBrush="{StaticResource BorderBrush}"
+                                 BorderThickness="1"/>
+                    </StackPanel>
+
+                    <!-- Port -->
+                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,8,8" MinWidth="80">
+                        <TextBlock Text="Port" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding ImapPort, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="12" Padding="8,6"
+                                 Background="{StaticResource CardBrush}"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 BorderBrush="{StaticResource BorderBrush}"
+                                 BorderThickness="1"/>
+                    </StackPanel>
+
+                    <!-- Username -->
+                    <StackPanel Grid.Column="2" Grid.Row="0" Margin="0,0,8,8">
+                        <TextBlock Text="Username" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding ImapUsername, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="12" Padding="8,6"
+                                 Background="{StaticResource CardBrush}"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 BorderBrush="{StaticResource BorderBrush}"
+                                 BorderThickness="1"/>
+                    </StackPanel>
+
+                    <!-- Password -->
+                    <StackPanel Grid.Column="3" Grid.Row="0" Margin="0,0,8,8">
+                        <TextBlock Text="Password" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,4"/>
+                        <PasswordBox x:Name="ImapPasswordBox"
+                                     FontSize="12" Padding="8,6"
+                                     Background="{StaticResource CardBrush}"
+                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                     BorderBrush="{StaticResource BorderBrush}"
+                                     BorderThickness="1"
+                                     PasswordChanged="ImapPasswordBox_PasswordChanged"/>
+                    </StackPanel>
+
+                    <!-- Buttons -->
+                    <StackPanel Grid.Column="4" Grid.Row="0" VerticalAlignment="Bottom" Margin="0,0,0,8">
+                        <Button Content="Save" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding ConfigureImapCommand}" Padding="12,6" FontSize="11"
+                                Margin="0,0,0,4"/>
+                        <Button Content="Connect &amp; Scan" Style="{StaticResource PrimaryButtonStyle}"
+                                Command="{Binding ScanImapCommand}" Padding="12,6" FontSize="11"/>
+                    </StackPanel>
+
+                    <!-- Connection status -->
+                    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
+                               Text="{Binding ImapConnectionStatus}"
+                               FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,4,0,0"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Detected threats list -->
+        <Border Grid.Row="6" Style="{StaticResource SurfaceBorderStyle}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding DetectedThreats}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource CardBrush}"
+                                    CornerRadius="{StaticResource DefaultCornerRadius}"
+                                    Padding="16,12" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Risk level indicator bar -->
+                                    <Border Grid.Column="0" Width="4" CornerRadius="2"
+                                            Margin="0,0,16,0">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="Critical">
+                                                        <Setter Property="Background" Value="#FF1744"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="High">
+                                                        <Setter Property="Background" Value="#FF9100"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="Medium">
+                                                        <Setter Property="Background" Value="#FFC107"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="Low">
+                                                        <Setter Property="Background" Value="#00E676"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+
+                                    <!-- Threat details -->
+                                    <StackPanel Grid.Column="1">
+                                        <!-- Top row: Subject and threat type badge -->
+                                        <Grid Margin="0,0,0,4">
+                                            <TextBlock Text="{Binding Subject}" FontWeight="SemiBold" FontSize="14"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       TextTrimming="CharacterEllipsis" MaxWidth="500"
+                                                       HorizontalAlignment="Left"/>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                <!-- Threat type badge -->
+                                                <Border Padding="8,2" CornerRadius="8" Margin="0,0,8,0">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#40B0B0B0"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ThreatType}" Value="Phishing">
+                                                                    <Setter Property="Background" Value="#40FF1744"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding ThreatType}" Value="Malware">
+                                                                    <Setter Property="Background" Value="#40FF9100"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding ThreatType}" Value="Spam">
+                                                                    <Setter Property="Background" Value="#40FFC107"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding ThreatType}" Value="Suspicious">
+                                                                    <Setter Property="Background" Value="#4000D9FF"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding ThreatType}" FontSize="10"
+                                                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                </Border>
+                                                <!-- Risk level badge -->
+                                                <Border Padding="8,2" CornerRadius="8">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#4000E676"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="Critical">
+                                                                    <Setter Property="Background" Value="#40FF1744"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="High">
+                                                                    <Setter Property="Background" Value="#40FF9100"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="Medium">
+                                                                    <Setter Property="Background" Value="#40FFC107"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="10" FontWeight="SemiBold">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="#00E676"/>
+                                                                <Setter Property="Text" Value="{Binding RiskLevel}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="Critical">
+                                                                        <Setter Property="Foreground" Value="#FF1744"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="High">
+                                                                        <Setter Property="Foreground" Value="#FF9100"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding RiskLevel}" Value="Medium">
+                                                                        <Setter Property="Foreground" Value="#FFC107"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!-- Sender -->
+                                        <TextBlock Margin="0,0,0,4" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
+                                            <Run Text="From: " FontWeight="SemiBold"/>
+                                            <Run Text="{Binding Sender, Mode=OneWay}"/>
+                                        </TextBlock>
+
+                                        <!-- Description -->
+                                        <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextSecondaryBrush}"
+                                                   FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4"/>
+
+                                        <!-- Bottom row: Time and blocked status -->
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding DetectedAt, StringFormat='Detected: {0:yyyy-MM-dd HH:mm:ss}'}"
+                                                       Style="{StaticResource SecondaryTextStyle}" Margin="0,0,16,0"/>
+                                            <TextBlock Text="BLOCKED" Foreground="{StaticResource DangerBrush}"
+                                                       FontSize="11" FontWeight="Bold"
+                                                       Visibility="{Binding IsBlocked, Converter={StaticResource BoolToVis}}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Action buttons -->
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0">
+                                        <Button Content="Block" Style="{StaticResource DangerButtonStyle}"
+                                                Padding="12,4" FontSize="11"
+                                                Command="{Binding DataContext.BlockSenderCommand,
+                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="0,0,0,4"/>
+                                        <Button Content="Allow" Style="{StaticResource SecondaryButtonStyle}"
+                                                Padding="12,4" FontSize="11"
+                                                Command="{Binding DataContext.AllowSenderCommand,
+                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                    <!-- Empty state -->
+                    <ItemsControl.Style>
+                        <Style TargetType="ItemsControl">
+                            <Style.Triggers>
+                                <Trigger Property="HasItems" Value="False">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <StackPanel HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" Margin="0,40">
+                                                    <TextBlock Text="No email threats detected."
+                                                               Foreground="{StaticResource SuccessBrush}"
+                                                               FontSize="16" FontWeight="SemiBold"
+                                                               HorizontalAlignment="Center"
+                                                               Margin="0,0,0,8"/>
+                                                    <TextBlock Text="Your inbox appears clean. Enable real-time protection to stay safe."
+                                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                                               FontSize="12"
+                                                               HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

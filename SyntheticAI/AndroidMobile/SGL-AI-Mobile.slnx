@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SGL.JudgeDredd.Core/SGL.JudgeDredd.Core.csproj" />
+    <Project Path="src/SGL.JudgeDredd.Shared/SGL.JudgeDredd.Shared.csproj" />
+    <Project Path="src/SGL.JudgeDredd.Api.Contracts/SGL.JudgeDredd.Api.Contracts.csproj" />
+    <Project Path="src/SGL.JudgeDredd.Mobile/SGL.JudgeDredd.Mobile.csproj" />
+  </Folder>
+</Solution>
