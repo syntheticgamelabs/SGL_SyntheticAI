@@ -1,0 +1,96 @@
+SGL SyntheticAI — Proprietary Software License
+================================================
+
+Copyright (c) 2024-2026 Synthetic Game Labs. All rights reserved.
+
+NOTICE: This software and associated documentation files (the "Software")
+are the proprietary and confidential property of Synthetic Game Labs
+("SGL"). The Software is protected by copyright law, trade secret law,
+and international treaty provisions.
+
+1. GRANT OF LICENSE
+   This repository is provided for EVALUATION AND DEMONSTRATION PURPOSES
+   ONLY. No license is granted to use, copy, modify, merge, publish,
+   distribute, sublicense, or sell copies of the Software or its source
+   code, except as expressly authorized in writing by Synthetic Game Labs.
+
+2. RESTRICTIONS
+   You may NOT:
+   (a) Copy, reproduce, or distribute the Software or any portion thereof;
+   (b) Reverse engineer, decompile, or disassemble the Software;
+   (c) Modify or create derivative works based on the Software;
+   (d) Remove or alter any proprietary notices, labels, or marks;
+   (e) Use the Software for any commercial purpose without a license;
+   (f) Transfer, sublicense, lease, lend, or rent the Software to any
+       third party;
+   (g) Use any portion of the Software's architecture, algorithms, or
+       implementation patterns in competing products.
+
+3. INTELLECTUAL PROPERTY
+   The Software embodies valuable trade secrets and proprietary technology
+   of Synthetic Game Labs, including but not limited to:
+   - Self-evolving AI threat detection architecture
+   - Autonomous malware reverse-engineering engine
+   - Self-mutating YARA rule generation algorithms
+   - Graph-based campaign detection methodology
+   - Gossip protocol with reputation-weighted voting
+   - Multi-LLM orchestration and slot management
+   - SecurityBrain composite threat scoring pipeline
+   - Isolation Forest anomaly detection implementation
+
+   All intellectual property rights in the foregoing remain exclusively
+   with Synthetic Game Labs.
+
+4. CONFIDENTIALITY
+   The Software contains confidential and proprietary information. You
+   agree to hold the Software in confidence and not to disclose its
+   contents or any information derived therefrom to any third party
+   without prior written consent of Synthetic Game Labs.
+
+5. EVALUATION LICENSE
+   Qualified investors, enterprise customers, and security researchers
+   may request an evaluation license by contacting:
+   security@syntheticgamelabs.com
+
+   Evaluation licenses are granted at the sole discretion of SGL and
+   are subject to a separate Evaluation Agreement.
+
+6. SDK AND API LICENSE
+   The SDK client libraries provided in the sdk/ directory are licensed
+   separately under the MIT License and may be freely used to build
+   integrations with authorized SGL SyntheticAI deployments. See
+   sdk/LICENSE for details.
+
+7. BINARY DISTRIBUTION
+   Pre-built binaries in the binaries/ directory may be downloaded and
+   installed for personal, non-commercial evaluation purposes. Commercial
+   deployment requires a separate commercial license agreement.
+
+8. TERMINATION
+   This license is effective until terminated. It will terminate
+   automatically without notice if you fail to comply with any term or
+   condition of this license. Upon termination, you must destroy all
+   copies of the Software in your possession.
+
+9. DISCLAIMER OF WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+10. LIMITATION OF LIABILITY
+    IN NO EVENT SHALL SYNTHETIC GAME LABS BE LIABLE FOR ANY CLAIM,
+    DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT,
+    OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+11. GOVERNING LAW
+    This license shall be governed by and construed in accordance with
+    the laws of the United States, without regard to its conflict of
+    law provisions.
+
+For licensing inquiries, partnership opportunities, or investment
+discussions, contact:
+
+  Synthetic Game Labs
+  Email: security@syntheticgamelabs.com
+  Web:   https://syntheticgamelabs.com

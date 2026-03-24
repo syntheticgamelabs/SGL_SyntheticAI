@@ -1,0 +1,75 @@
+# SGL SyntheticAI .gitignore
+
+# Build outputs
+bin/
+obj/
+publish/
+*.exe.bak
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+.idea/
+
+# NuGet
+packages/
+*.nupkg
+**/[Pp]ackages/**
+
+# Secrets & credentials
+*.key
+*.pem
+*.pfx
+*.p12
+.env
+.env.*
+data/jwt_secret.key
+data/registrations.log
+data/server_settings.json
+
+# User data
+data/llm_memory_*.json
+data/chat_settings.json
+data/settings.json
+data/users.json
+data/threat_signatures.json
+
+# LLM Models (too large for Git)
+LLM/
+*.gguf
+*.ggml
+*.bin
+
+# Stable Diffusion (too large)
+SDWebUi/
+Python310/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Server installer bin files (too large)
+*.bin
+
+# Node modules (website)
+node_modules/
+dist/

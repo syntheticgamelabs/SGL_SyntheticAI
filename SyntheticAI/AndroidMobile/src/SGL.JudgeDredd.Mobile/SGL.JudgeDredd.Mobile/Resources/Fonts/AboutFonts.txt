@@ -1,2 +1,0 @@
-This is a placeholder for the fonts directory.
-Add OpenSans-Regular.ttf and OpenSans-Semibold.ttf here.
