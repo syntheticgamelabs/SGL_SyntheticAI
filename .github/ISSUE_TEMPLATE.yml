@@ -1,0 +1,39 @@
+name: Bug Report
+description: Report a bug in documentation or demo code
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. This repository contains documentation and demo code only.
+        For production system issues, contact syntheticgamelabs@gmail.com directly.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Documentation
+        - Demo Code
+        - API Specification
+        - SDK Examples
+        - Dashboard Visualization
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+    validations:
+      required: true

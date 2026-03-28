@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://syntheticai.syntheticgamelabs.com/schemas/telemetry_event/v1.0.0",
+  "title": "SyntheticAI Telemetry Event",
+  "description": "Defines the canonical telemetry event format ingested by the SyntheticAI threat-intelligence platform. All endpoint agents, SIEM forwarders, and third-party integrations MUST conform to this schema when submitting events to the /api/telemetry endpoints.",
+  "type": "object",
+  "required": [
+    "device_id",
+    "timestamp",
+    "event_type"
+  ],
+  "properties": {
+    "device_id": {
+      "type": "string",
+      "description": "Unique identifier for the reporting device or agent instance.",
+      "minLength": 1,
+      "maxLength": 256,
+      "examples": ["agent-4a7b9c2e-df01-4e3a-b8c7-1a2b3c4d5e6f"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp indicating when the event was observed on the endpoint.",
+      "examples": ["2026-03-28T14:32:07.042Z"]
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "process_start",
+        "process_end",
+        "file_create",
+        "file_modify",
+        "file_delete",
+        "network_connect",
+        "network_dns",
+        "registry_modify"
+      ],
+      "description": "Category of the observed endpoint event."
+    },
+    "process_name": {
+      "type": "string",
+      "description": "Name of the process that generated or is associated with the event.",
+      "examples": ["svchost.exe"]
+    },
+    "parent_process": {
+      "type": "string",
+      "description": "Name of the parent process in the process tree.",
+      "examples": ["services.exe"]
+    },
+    "file_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the relevant file, if applicable.",
+      "pattern": "^[A-Fa-f0-9]{64}$",
+      "examples": ["e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"]
+    },
+    "file_path": {
+      "type": "string",
+      "description": "Full filesystem path of the file involved in the event.",
+      "examples": ["C:\\Windows\\System32\\cmd.exe"]
+    },
+    "source_ip": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "Source IP address for network events.",
+      "examples": ["192.168.1.100"]
+    },
+    "destination_ip": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "Destination IP address for network events.",
+      "examples": ["203.0.113.50"]
+    },
+    "destination_port": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
+      "description": "Destination port number for network events.",
+      "examples": [443]
+    },
+    "dns_query": {
+      "type": "string",
+      "description": "Domain name queried during a DNS resolution event.",
+      "examples": ["malicious-c2.example.com"]
+    },
+    "registry_path": {
+      "type": "string",
+      "description": "Full registry key path for registry modification events.",
+      "examples": ["HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"]
+    },
+    "registry_value": {
+      "type": "string",
+      "description": "Value written to the registry key.",
+      "examples": ["C:\\Users\\Public\\payload.exe"]
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Name of the user account under which the event occurred.",
+      "examples": ["DOMAIN\\jdoe"]
+    },
+    "command_line": {
+      "type": "string",
+      "description": "Full command-line string used to launch the process.",
+      "examples": ["powershell.exe -enc SQBFAFgA..."]
+    },
+    "threat_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "SyntheticAI-computed threat confidence score. 0.0 = benign, 1.0 = confirmed malicious.",
+      "examples": [0.87]
+    },
+    "mitre_tactic": {
+      "type": "string",
+      "description": "MITRE ATT&CK tactic identifier associated with the event.",
+      "examples": ["TA0002"]
+    },
+    "mitre_technique": {
+      "type": "string",
+      "description": "MITRE ATT&CK technique identifier associated with the event.",
+      "examples": ["T1059.001"]
+    }
+  },
+  "additionalProperties": false,
+  "_meta": {
+    "copyright": "Copyright 2024-2026 Synthetic Game Labs. All rights reserved.",
+    "license": "Proprietary - provided for integration purposes only.",
+    "version": "1.0.0",
+    "maintainer": "SyntheticAI Platform Engineering <platform@syntheticgamelabs.com>"
+  }
+}

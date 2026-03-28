@@ -1,0 +1,109 @@
+{
+  "metadata": {
+    "description": "Sample threat graph for SyntheticAI demo",
+    "generatedAt": "2026-03-28T08:25:00Z",
+    "disclaimer": "This is simulated data for demonstration purposes only."
+  },
+  "nodes": [
+    {
+      "id": "DEVICE-5192",
+      "type": "Device",
+      "riskScore": 0.0,
+      "label": "Endpoint workstation"
+    },
+    {
+      "id": "cmd.exe",
+      "type": "Process",
+      "riskScore": 0.3,
+      "label": "Windows command interpreter"
+    },
+    {
+      "id": "powershell.exe",
+      "type": "Process",
+      "riskScore": 0.7,
+      "label": "PowerShell spawned by cmd.exe"
+    },
+    {
+      "id": "explorer.exe",
+      "type": "Process",
+      "riskScore": 0.0,
+      "label": "Windows Explorer shell"
+    },
+    {
+      "id": "192.168.1.50",
+      "type": "Network",
+      "riskScore": 0.6,
+      "label": "Internal host receiving reverse connection"
+    },
+    {
+      "id": "10.10.14.7",
+      "type": "Network",
+      "riskScore": 0.5,
+      "label": "Internal host on uncommon port"
+    },
+    {
+      "id": "203.0.113.42",
+      "type": "Network",
+      "riskScore": 0.4,
+      "label": "External host on port 8080"
+    },
+    {
+      "id": "chrome.exe",
+      "type": "Process",
+      "riskScore": 0.0,
+      "label": "Chrome browser normal activity"
+    }
+  ],
+  "edges": [
+    {
+      "source": "DEVICE-5192",
+      "target": "cmd.exe",
+      "relationship": "spawned"
+    },
+    {
+      "source": "explorer.exe",
+      "target": "cmd.exe",
+      "relationship": "parent-of"
+    },
+    {
+      "source": "cmd.exe",
+      "target": "powershell.exe",
+      "relationship": "parent-of"
+    },
+    {
+      "source": "powershell.exe",
+      "target": "192.168.1.50",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "powershell.exe",
+      "target": "10.10.14.7",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "cmd.exe",
+      "target": "203.0.113.42",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "DEVICE-5192",
+      "target": "powershell.exe",
+      "relationship": "spawned"
+    },
+    {
+      "source": "explorer.exe",
+      "target": "chrome.exe",
+      "relationship": "parent-of"
+    },
+    {
+      "source": "DEVICE-5192",
+      "target": "explorer.exe",
+      "relationship": "spawned"
+    },
+    {
+      "source": "cmd.exe",
+      "target": "10.10.14.7",
+      "relationship": "connected-to"
+    }
+  ]
+}

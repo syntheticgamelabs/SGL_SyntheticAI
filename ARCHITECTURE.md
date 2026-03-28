@@ -1,544 +1,349 @@
-# Architecture — SGL SyntheticAI v1.1.46
+# SyntheticAI — System Architecture
 
-This document provides a comprehensive overview of the SGL SyntheticAI system architecture, component interactions, and design philosophy.
+> Version 1.1.49 Beta | Synthetic Game Labs | 2026
 
----
+## Overview
 
-## Table of Contents
-
-- [Design Philosophy](#design-philosophy)
-- [System Overview](#system-overview)
-- [Solution Structure](#solution-structure)
-- [Security Engine Layer](#security-engine-layer)
-- [AI/ML Layer](#aiml-layer)
-- [Network Layer](#network-layer)
-- [Server & API Layer](#server--api-layer)
-- [Data Layer](#data-layer)
-- [Client Platforms](#client-platforms)
-- [Threat Scoring Pipeline](#threat-scoring-pipeline)
-- [Self-Evolving AI Architecture](#self-evolving-ai-architecture)
-- [Gossip Protocol Design](#gossip-protocol-design)
-- [Data Flow Diagrams](#data-flow-diagrams)
+SyntheticAI is a multi-platform autonomous cyber defense system built on .NET 8. The architecture follows a distributed client-server model where lightweight endpoint agents collect telemetry and a centralized server platform performs analysis, investigation, and response orchestration.
 
 ---
 
-## Design Philosophy
-
-SGL SyntheticAI is built on four core architectural principles:
-
-1. **AI-Native Security** — LLM inference is a first-class citizen, not a bolt-on. Every threat assessment path can leverage local LLM analysis.
-
-2. **Zero Cloud Dependency** — All security-critical functions operate entirely offline. No telemetry is sent externally. LLM inference runs on-device via llama.cpp.
-
-3. **Defense in Depth** — Multiple independent detection engines (YARA, hash, heuristic, behavioral, graph, ML) provide overlapping coverage. No single engine failure compromises protection.
-
-4. **Autonomous Evolution** — The system trains, validates, and deploys new detection models without human intervention, adapting to emerging threats in real-time.
-
----
-
-## System Overview
+## High-Level Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                    SGL SyntheticAI v1.1.46                        │
-├──────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                       │
-│  │ WPF      │  │ Linux    │  │ Android  │                       │
-│  │ Desktop  │  │ CLI      │  │ MAUI     │                       │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘                       │
-│       └──────────────┼─────────────┘                              │
-│                      ▼                                            │
-│  ┌────────────────────────────────────────────────────────┐      │
-│  │              SECURITY ENGINE LAYER                      │      │
-│  │                                                         │      │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐  │      │
-│  │  │  Antivirus  │  │ SecurityBrain │  │ Malware RE   │  │      │
-│  │  │  YARA+Hash  │  │ Composite    │  │ PE Analysis  │  │      │
-│  │  │  +Heuristic │  │ Scoring      │  │ +Classify    │  │      │
-│  │  └─────────────┘  └──────────────┘  └──────────────┘  │      │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐  │      │
-│  │  │ YARA Rule   │  │ Campaign     │  │ Evolution    │  │      │
-│  │  │ Generator   │  │ Detection    │  │ Engine       │  │      │
-│  │  │ (auto-gen)  │  │ (graph ML)   │  │ (IsoForest)  │  │      │
-│  │  └─────────────┘  └──────────────┘  └──────────────┘  │      │
-│  └────────────────────────────────────────────────────────┘      │
-│                      ▼                                            │
-│  ┌────────────────────────────────────────────────────────┐      │
-│  │              LLM / AI LAYER                             │      │
-│  │                                                         │      │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐  │      │
-│  │  │ MultiLLM    │  │ Chat Service │  │ TTS Engine   │  │      │
-│  │  │ 4-Slot Mgr  │  │ (LlamaSharp) │  │ (SAPI+Qwen) │  │      │
-│  │  └─────────────┘  └──────────────┘  └──────────────┘  │      │
-│  └────────────────────────────────────────────────────────┘      │
-│                      ▼                                            │
-│  ┌────────────────────────────────────────────────────────┐      │
-│  │              NETWORK LAYER                              │      │
-│  │                                                         │      │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐  │      │
-│  │  │ Firewall    │  │ Gossip       │  │ Threat Intel │  │      │
-│  │  │ (WinFW COM) │  │ Protocol     │  │ (abuse.ch)   │  │      │
-│  │  └─────────────┘  └──────────────┘  └──────────────┘  │      │
-│  └────────────────────────────────────────────────────────┘      │
-│                      ▼                                            │
-│  ┌────────────────────────────────────────────────────────┐      │
-│  │              SERVER + API LAYER                         │      │
-│  │  28 API endpoints | JWT auth | WebSocket                │      │
-│  │  Website hosting | SD WebUI proxy | Client sync         │      │
-│  └────────────────────────────────────────────────────────┘      │
-│                      ▼                                            │
-│  ┌────────────────────────────────────────────────────────┐      │
-│  │              DATA LAYER                                 │      │
-│  │  SQLite (KnowledgeBase) | JSON configs | YARA rules     │      │
-│  │  campaigns.json | model_registry.json | threat_sigs     │      │
-│  │  EventBus | NotificationService                         │      │
-│  └────────────────────────────────────────────────────────┘      │
-└──────────────────────────────────────────────────────────────────┘
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          SyntheticAI Platform                               ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                             ║
+║  ┌────────────┐   ┌────────────┐   ┌────────────┐   ┌────────────────┐     ║
+║  │  Windows   │   │   Linux    │   │  Android   │   │  Future:       │     ║
+║  │  Client    │   │   Client   │   │  Agent     │   │  macOS / iOS   │     ║
+║  │  (WPF)     │   │ (Console)  │   │  (MAUI)    │   │                │     ║
+║  └─────┬──────┘   └─────┬──────┘   └─────┬──────┘   └────────────────┘     ║
+║        │                │                 │                                  ║
+║        └────────────────┼─────────────────┘                                  ║
+║                         │                                                    ║
+║                  ┌──────▼──────┐                                             ║
+║                  │  REST API   │  ← ASP.NET Core Minimal API (Kestrel)      ║
+║                  │  WebSocket  │  ← Real-time event streaming               ║
+║                  │  JWT Auth   │  ← HMAC-SHA256, 512-bit key                ║
+║                  └──────┬──────┘                                             ║
+║                         │                                                    ║
+║  ╔══════════════════════▼══════════════════════════════════════════════╗     ║
+║  ║                   Core Processing Pipeline                         ║     ║
+║  ║                                                                    ║     ║
+║  ║  ┌──────────────┐  ┌────────────────┐  ┌───────────────────────┐  ║     ║
+║  ║  │  EventBus    │→ │  Normalizer    │→ │  Security Data Lake   │  ║     ║
+║  ║  │  (Pub/Sub)   │  │  (Enrichment)  │  │  (Hot/Warm/Cold)      │  ║     ║
+║  ║  └──────────────┘  └────────────────┘  └───────────┬───────────┘  ║     ║
+║  ║                                                     │              ║     ║
+║  ║  ┌─────────────────────────────────────────────────┤              ║     ║
+║  ║  │                                                  │              ║     ║
+║  ║  ▼                                                  ▼              ║     ║
+║  ║  ┌──────────────────────┐  ┌───────────────────────────────────┐  ║     ║
+║  ║  │  Threat Intelligence │  │  ML Analysis Engine               │  ║     ║
+║  ║  │  ┌────────────────┐  │  │  ┌─────────────────────────────┐  │  ║     ║
+║  ║  │  │ Evidence Graph │  │  │  │ Gradient Boosting Trees     │  │  ║     ║
+║  ║  │  │ Query Engine   │  │  │  │ Graph ML Risk Propagation   │  │  ║     ║
+║  ║  │  │ Timeline Recon │  │  │  │ Logistic Regression         │  │  ║     ║
+║  ║  │  │ Campaign Det.  │  │  │  │ Feature Store               │  │  ║     ║
+║  ║  │  │ Threat Hunter  │  │  │  │ Training Scheduler          │  │  ║     ║
+║  ║  │  └────────────────┘  │  │  └─────────────────────────────┘  │  ║     ║
+║  ║  └──────────────────────┘  └───────────────────────────────────┘  ║     ║
+║  ║                                                                    ║     ║
+║  ║  ┌──────────────────────┐  ┌───────────────────────────────────┐  ║     ║
+║  ║  │  AI Investigation    │  │  Network Analysis                 │  ║     ║
+║  ║  │  ┌────────────────┐  │  │  ┌─────────────────────────────┐  │  ║     ║
+║  ║  │  │ LLM Inference  │  │  │  │ Deep Packet Inspection      │  │  ║     ║
+║  ║  │  │ ASRE Pipeline  │  │  │  │ DNS Exfiltration Detection  │  │  ║     ║
+║  ║  │  │ Response Orch. │  │  │  │ TLS/SNI Analysis            │  │  ║     ║
+║  ║  │  │ Threat Sim.    │  │  │  │ Protocol Anomaly Detection  │  │  ║     ║
+║  ║  │  └────────────────┘  │  │  └─────────────────────────────┘  │  ║     ║
+║  ║  └──────────────────────┘  └───────────────────────────────────┘  ║     ║
+║  ║                                                                    ║     ║
+║  ╚════════════════════════════════════════════════════════════════════╝     ║
+║                         │                                                    ║
+║  ┌──────────────────────▼──────────────────────────────────────────────┐    ║
+║  │                    Output / Response Layer                          │    ║
+║  │  ┌────────────┐ ┌──────────┐ ┌───────────┐ ┌────────────────────┐  │    ║
+║  │  │ Admin UI   │ │ Alerts   │ │ 3D Threat │ │ Push Notifications │  │    ║
+║  │  │ Dashboard  │ │ & Reports│ │ Universe  │ │ (FCM)              │  │    ║
+║  │  └────────────┘ └──────────┘ └───────────┘ └────────────────────┘  │    ║
+║  └─────────────────────────────────────────────────────────────────────┘    ║
+║                                                                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 ```
 
 ---
 
-## Solution Structure
+## Component Details
 
-The solution contains **14 projects** organized by responsibility:
+### 1. Endpoint Agents
 
-| Project | Type | Purpose |
-|---------|------|---------|
-| `SGL.JudgeDredd.App` | WPF Application | Windows desktop client |
-| `SGL.JudgeDredd.ServerHost` | Console App | Standalone server host |
-| `SGL.JudgeDredd.Server` | Class Library | API server, endpoints, middleware |
-| `SGL.JudgeDredd.Core` | Class Library | Core services, scanning engine, event bus |
-| `SGL.JudgeDredd.Security` | Class Library | SecurityBrain, ML engines, threat analysis |
-| `SGL.JudgeDredd.LLM` | Class Library | LLamaSharp integration, multi-model management |
-| `SGL.JudgeDredd.Shared` | Class Library | Shared types, version info, configuration |
-| `SGL.JudgeDredd.Api.Contracts` | Class Library | API DTOs, request/response models |
-| `SGL.JudgeDredd.Mobile` | MAUI App | Android client |
-| `SGL.JudgeDredd.LinuxClient` | Console App | Linux CLI client |
-| `SGL.JudgeDredd.LinuxServer` | Console App | Linux server host |
-| `SGL.JudgeDredd.Installer` | Misc | Inno Setup installer scripts |
-| `SGL.JudgeDredd.Website` | Static | React SPA website |
-| `SGL.JudgeDredd.Tools` | Console App | Utility tools and scripts |
+Lightweight agents deployed on endpoints that collect process telemetry, file system events, network connections, and registry modifications.
 
-**Total: 1,044+ source files | 125,000+ lines of code**
+| Component | Platform | Framework |
+|-----------|----------|-----------|
+| Windows Desktop Agent | Windows 10/11/Server | .NET 8 WPF |
+| Linux Agent | Ubuntu/Debian/RHEL | .NET 8 Console |
+| Mobile Agent | Android 10+ | .NET MAUI |
+
+**Agent Responsibilities:**
+- Process creation/termination monitoring
+- File hash computation and file system audit
+- Network connection tracking
+- Registry modification detection (Windows)
+- Firewall rule management
+- Local threat scoring
+
+### 2. Server Platform
+
+The server is a self-hosted ASP.NET Core application using Kestrel, providing:
+
+- **44+ REST API endpoints** across 12 endpoint groups
+- **WebSocket** real-time streaming for live telemetry and alerts
+- **JWT Authentication** with HMAC-SHA256 and 512-bit keys
+- **CSRF Protection** with Origin/Referer validation
+- **Rate Limiting** per-IP WebSocket connection management
+- **Static file hosting** for Admin UI and client downloads
+
+### 3. Security Data Lake
+
+A tiered storage architecture for security event data:
+
+```
+┌─────────────────────────────────────────────────┐
+│                Security Data Lake                │
+│                                                  │
+│  ┌──────────┐   Millisecond queries              │
+│  │ HOT      │   Today's events in-memory         │
+│  │ (Memory) │   ConcurrentQueue write buffer     │
+│  ├──────────┤                                    │
+│  │ WARM     │   Secondary indexes                │
+│  │ (Index)  │   Hash, IP, Host, Process lookup   │
+│  ├──────────┤                                    │
+│  │ COLD     │   Append-only JSONL                │
+│  │ (Disk)   │   Daily rotation, compressed       │
+│  └──────────┘                                    │
+│                                                  │
+│  Capacity: 100K events (hot cache)               │
+│  Flush: 5-second write buffer cycle              │
+│  Maintenance: 10-minute compact cycle            │
+└─────────────────────────────────────────────────┘
+```
+
+### 4. Threat Intelligence Layer
+
+| Engine | Purpose |
+|--------|---------|
+| Evidence Graph | Maps relationships between hosts, processes, files, and network indicators |
+| Query Engine | Cross-tier search across hot cache and cold storage |
+| Timeline Reconstructor | Rebuilds attack timelines with temporal ordering |
+| Campaign Detector | Union-Find clustering to identify coordinated attacks |
+| Threat Hunter | Retroactive hunting across all stored events |
+
+### 5. ML Analysis Engine
+
+Ensemble machine learning pipeline implemented in pure C# (no Python dependency):
+
+```
+Input Telemetry
+       │
+       ▼
+┌──────────────┐
+│ Feature Store │  ← Welford's online algorithm
+│ (20-dim)     │  ← Z-score normalization
+└──────┬───────┘
+       │
+  ┌────┼─────────────────┐
+  │    │                  │
+  ▼    ▼                  ▼
+┌────┐ ┌──────────┐ ┌──────────┐
+│ LR │ │ Gradient │ │ Graph ML │
+│    │ │ Boosting │ │ (Belief  │
+│    │ │ Trees    │ │  Prop.)  │
+└─┬──┘ └────┬─────┘ └────┬────┘
+  │         │             │
+  └─────────┼─────────────┘
+            │
+    ┌───────▼────────┐
+    │ Ensemble Blend │  ← Adaptive weight adjustment
+    │ (Weighted Avg) │  ← 24-hour retraining cycle
+    └───────┬────────┘
+            │
+            ▼
+     Risk Score [0.0 - 1.0]
+```
+
+### 6. AI Investigation Layer
+
+| Component | Description |
+|-----------|-------------|
+| LLM Inference | Local GGUF model inference via LLamaSharp for threat analysis |
+| ASRE Pipeline | 5-stage autonomous research: Mine → Cluster → Hypothesize → Generate Rules → Report |
+| Response Orchestrator | Coordinates automated containment and remediation actions |
+| Adversarial Tester | Generates evasion techniques to validate detection pipeline |
+
+### 7. Network Analysis
+
+- **Deep Packet Inspection** — Protocol-level traffic analysis
+- **DNS Exfiltration Detection** — Entropy analysis on DNS queries
+- **TLS/SNI Analysis** — Certificate and server name inspection
+- **Protocol Anomaly Detection** — Deviation from expected protocol behavior
+
+### 8. Visualization & Response
+
+- **Admin Dashboard** — Full management UI with all configuration tabs
+- **3D Threat Universe** — Golden-ratio spiral layout with constellation detection
+- **Push Notifications** — Firebase Cloud Messaging (FCM HTTP v1)
+- **Automated Response** — Quarantine, firewall rule injection, process termination
 
 ---
 
-## Security Engine Layer
-
-### Multi-Engine Scanner
-
-The antivirus scanner runs three independent detection engines in parallel:
+## Data Flow
 
 ```
-File Input
-    │
-    ├──▶ YARA Engine ─────▶ Pattern match against .yar rule files
-    │                       (dnYara NuGet binding)
-    │
-    ├──▶ Hash Engine ──────▶ SHA-256 hash lookup in signature DB
-    │                       (SQLite + in-memory bloom filter)
-    │
-    └──▶ Heuristic Engine ─▶ 14-point behavioral analysis
-                             (entropy, imports, strings, packers)
-         │
-         ▼
-    Composite Verdict (weighted scoring)
-```
-
-### Heuristic Analysis Points
-
-| # | Check | Weight |
-|---|-------|--------|
-| 1 | PE file entropy (>7.0 suspicious) | High |
-| 2 | Suspicious API imports (VirtualAlloc, CreateRemoteThread, etc.) | High |
-| 3 | Suspicious string patterns | Medium |
-| 4 | Section name anomalies (.UPX, .themida) | Medium |
-| 5 | Packer detection (30+ signatures) | High |
-| 6 | Entry point anomalies | Medium |
-| 7 | Import table size ratio | Low |
-| 8 | Resource section anomalies | Low |
-| 9 | Digital signature validation | Medium |
-| 10 | File size vs section size mismatch | Low |
-| 11 | Overlay data detection | Low |
-| 12 | TLS callback presence | Medium |
-| 13 | Debug directory anomalies | Low |
-| 14 | Compiler/linker artifacts | Low |
-
-### Malware Reverse-Engineering Engine
-
-Autonomous PE binary analysis pipeline:
-
-```
-Suspicious File
+Endpoint Event
     │
     ▼
-┌─────────────────┐
-│  PE Reader       │  System.Reflection.PortableExecutable
-│  ├─ Headers      │  DOS, COFF, PE Optional headers
-│  ├─ Sections     │  Per-section entropy calculation
-│  ├─ Import Table │  Manual ILT/IAT parsing
-│  ├─ Strings      │  Embedded string extraction
-│  └─ Packers      │  30+ packer signature matching
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  Attack Graph    │  Directed graph of malicious behaviors
-│  Builder         │  Nodes: capabilities, techniques
-│                  │  Edges: call/data flow relationships
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  Classifier      │  Weighted heuristic scoring
-│  ├─ Entropy      │  0.25 weight
-│  ├─ Imports      │  0.25 weight
-│  ├─ Packers      │  0.20 weight
-│  ├─ Strings      │  0.15 weight
-│  └─ Attack Graph │  0.15 weight
-└────────┬────────┘
-         ▼
-    Classification: Trojan | Ransomware | Worm | Spyware | etc.
-    Confidence: 0.0 - 1.0
-```
-
-### Self-Mutating YARA Rule Generator
-
-```
-New Malware Sample
+EventBus (10K capacity BlockingCollection)
     │
     ▼
-┌─────────────────┐
-│ Feature Extract  │  String scoring (length, uniqueness, entropy)
-│                  │  Benign string exclusion
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│ Rule Synthesis   │  Valid YARA syntax generation
-│ ├─ Meta tags     │  Author, date, description, hash
-│ ├─ PE magic      │  MZ header check
-│ ├─ Conditions    │  Threshold-based (N of M strings)
-│ └─ Strings       │  Discriminating byte patterns
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│ Validation       │  Test against clean file corpus
-│                  │  Reject if FP rate > 1%
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│ Evolution        │  Add patterns from new samples
-│                  │  Tighten conditions, increment version
-└────────┬────────┘
-         ▼
-    data/yara_rules/auto_*.yar
+DataLake Ingestor (normalize + enrich)
+    │
+    ├──→ EventStore (append JSONL + hot cache)
+    ├──→ TelemetryRepository (secondary indexes)
+    ├──→ NetworkFlowRepository (flow tracking)
+    │
+    ▼
+Feature Extraction (20-dimensional vector)
+    │
+    ▼
+ML Ensemble Prediction → Risk Score
+    │
+    ├── score < 0.3 → Log only
+    ├── 0.3–0.7 → Alert + Investigation
+    └── score > 0.7 → Alert + Auto-Response + Investigation
+    │
+    ▼
+Evidence Graph (add nodes/edges)
+    │
+    ▼
+Campaign Detection (Union-Find clustering)
+    │
+    ▼
+Timeline Reconstruction
+    │
+    ▼
+Report Generation + Push Notification
 ```
 
 ---
 
-## AI/ML Layer
+## API Architecture
 
-### Multi-LLM Slot Architecture
+The server exposes a RESTful API organized into endpoint groups:
+
+| Group | Endpoints | Purpose |
+|-------|-----------|---------|
+| Authentication | 3 | Login, token refresh, registration |
+| Telemetry | 4 | Event submission, batch upload, status |
+| Threats | 5 | Threat queries, alerts, severity filtering |
+| Data Lake | 12 | Hash/IP/host queries, timelines, campaigns, hunts |
+| Threat Universe | 5 | 3D visualization snapshots, paths, constellations |
+| Push Notifications | 4 | Device registration, send, status |
+| DPI Network | 4 | Connection status, alerts, analysis |
+| System | 7+ | Health, config, updates, diagnostics |
+
+See [api/api-spec.yaml](api/api-spec.yaml) for the full OpenAPI specification.
+
+---
+
+## Security Architecture
+
+| Layer | Mechanism |
+|-------|-----------|
+| Authentication | JWT (HMAC-SHA256, 24hr expiry) |
+| CSRF Protection | Origin/Referer validation, Bearer token bypass |
+| Rate Limiting | Per-IP connection tracking, sliding window |
+| Data at Rest | Append-only storage, checksum verification |
+| Transport | HTTPS/TLS 1.2+ |
+| Client Auth | API key + JWT token |
+
+See [SECURITY_MODEL.md](SECURITY_MODEL.md) for the complete security model.
+
+---
+
+## Deployment Architecture
 
 ```
 ┌─────────────────────────────────────────┐
-│          MultiLlmManager                 │
-│                                          │
-│  Slot 0: MainEngine    [Qwen-7B]  ●     │
-│  Slot 1: AiChat        [Llama-3]  ●     │
-│  Slot 2: SecurityAI    [Mistral]  ○     │
-│  Slot 3: Available     [empty]    ○     │
-│                                          │
-│  ● = Mounted    ○ = Empty               │
-│  Thread-safe via SemaphoreSlim           │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│  LlmService Bridge           │
-│  ├─ Primary: LlmModelManager │
-│  └─ Fallback: MultiLlmManager│
-│     .GetMainEngine()         │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│  ChatSessionManager          │
-│  Per-user session context    │
-│  Token streaming via         │
-│  IAsyncEnumerable<string>    │
-└──────────────────────────────┘
-```
-
-### SecurityBrain Threat Scoring
-
-```
-Threat Event
-    │
-    ├──▶ Behavioral Score  (0.30 weight) ──▶ Process tree analysis,
-    │                                         syscall patterns
-    │
-    ├──▶ Graph Score       (0.40 weight) ──▶ Threat graph connectivity,
-    │                                         relationship analysis
-    │
-    ├──▶ LLM Confidence    (0.20 weight) ──▶ Natural language threat
-    │                                         assessment via local LLM
-    │
-    └──▶ Threat Intel      (0.10 weight) ──▶ IOC matching against
-                                              abuse.ch feeds
-         │
-         ▼
-    Composite Score = Σ(weight × score)
-    Range: 0.0 (benign) → 1.0 (critical threat)
+│           Server Deployment             │
+│                                         │
+│  ┌─────────┐  ┌────────┐  ┌─────────┐  │
+│  │ Kestrel │  │ Admin  │  │  LLM    │  │
+│  │ API     │  │ Web UI │  │ Models  │  │
+│  │ Server  │  │        │  │ (GGUF)  │  │
+│  └─────────┘  └────────┘  └─────────┘  │
+│                                         │
+│  ┌──────────────────────────────────┐   │
+│  │ Bundled Data & Services          │   │
+│  │ ├── Threat Signatures            │   │
+│  │ ├── ML Models                    │   │
+│  │ ├── Knowledge Base               │   │
+│  │ ├── Client Downloads (Win/Lin)   │   │
+│  │ ├── Website (Static)             │   │
+│  │ ├── TTS Engine                   │   │
+│  │ └── SD WebUI                     │   │
+│  └──────────────────────────────────┘   │
+│                                         │
+│  Installer: Inno Setup 6               │
+│  Size: ~60GB (all data bundled)         │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-## Self-Evolving AI Architecture
-
-The Evolution Engine implements a fully autonomous model training, validation, and deployment pipeline:
+## Project Structure
 
 ```
-Telemetry Events (via EventBus)
-    │
-    ▼
-┌─────────────────────┐
-│ Feature Extractor    │  7-element vectors:
-│ ├─ Process hash      │  [0] binary hash → enum mapping
-│ ├─ Tree depth        │  [1] process tree depth / 10
-│ ├─ Port risk         │  [2] known risky port score
-│ ├─ Cmd entropy       │  [3] Shannon entropy of command line
-│ ├─ Network risk      │  [4] geo/blacklist risk score
-│ ├─ Time of day       │  [5] hour / 24.0 (cyclical)
-│ └─ File entropy      │  [6] associated file entropy / 8.0
-└────────┬────────────┘
-         │
-         ▼ (accumulates events for 6 hours)
-┌─────────────────────┐
-│ Isolation Forest     │  Pure C# Implementation
-│ ├─ 100 trees         │  Each tree: random feature splits
-│ ├─ 256 subsamples    │  Per-tree random subsample
-│ └─ Anomaly scoring   │  Score = 2^(-avgPath / c(n))
-│                      │  Shorter path = more anomalous
-└────────┬────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│ Validation           │  Test against known-good events
-│                      │  REJECT if FP rate > 5%
-└────────┬────────────┘
-         │ (pass)
-         ▼
-┌─────────────────────┐
-│ Model Registry       │  data/models/anomaly_model_vN.json
-│ ├─ Version tracking  │  Semantic versioning
-│ ├─ Performance stats │  FP rate, detection rate, sample size
-│ └─ Rollback support  │  Previous models retained
-└────────┬────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│ Strategy Generator   │  Auto-generate detection rules
-│                      │  from anomaly clusters
-│                      │  Human-readable rule descriptions
-└─────────────────────┘
+SyntheticAI/
+├── src/
+│   ├── SGL.JudgeDredd.App/          # Windows WPF Desktop Client
+│   ├── SGL.JudgeDredd.Server/       # API Server + Endpoints
+│   ├── SGL.JudgeDredd.Security/     # Core Security Engines
+│   ├── SGL.JudgeDredd.DataLake/     # Security Data Lake
+│   ├── SGL.JudgeDredd.Core/         # Shared Core Libraries
+│   ├── SGL.JudgeDredd.Shared/       # Cross-project Models
+│   ├── SGL.JudgeDredd.Antivirus/    # AV Scanning Engine
+│   ├── SGL.JudgeDredd.Firewall/     # Firewall Management
+│   ├── SGL.JudgeDredd.LLM/         # LLM Integration Layer
+│   ├── SGL.JudgeDredd.KnowledgeBase/# Threat Knowledge Base
+│   ├── SGL.JudgeDredd.LinuxClient/  # Linux Console Client
+│   ├── SGL.JudgeDredd.MobileApp/    # Android MAUI App
+│   └── ...
+├── tests/
+│   └── SGL.JudgeDredd.Tests/        # xUnit Integration Tests
+└── [build outputs]
 ```
 
-### Isolation Forest Algorithm Detail
-
-```
-BuildTree(data, depth):
-    if |data| ≤ 1 or depth ≥ max_depth:
-        return LeafNode(size=|data|)
-
-    feature = random(0..6)
-    min_val, max_val = range(data[feature])
-    split = uniform(min_val, max_val)
-
-    left  = { x ∈ data : x[feature] < split }
-    right = { x ∈ data : x[feature] ≥ split }
-
-    return InternalNode(
-        feature, split,
-        left=BuildTree(left, depth+1),
-        right=BuildTree(right, depth+1)
-    )
-
-Score(x):
-    avgPath = mean(PathLength(x, tree) for tree in forest)
-    c_n = 2 * (ln(n-1) + γ) - (2*(n-1)/n)
-    return 2^(-avgPath / c_n)
-    // Score > 0.5 = anomalous
-    // Score < 0.5 = normal
-```
+15 .NET projects | 1,200+ source files | 133,000+ lines of C#
 
 ---
 
-## Gossip Protocol Design
+## Requirements
 
-Peer-to-peer threat intelligence sharing across swarm nodes:
-
-```
-Node A                    Node B                    Node C
-  │                         │                         │
-  │──UDP Broadcast──────▶  │                         │
-  │  (fan-out=3)           │──UDP Forward──────────▶│
-  │                         │  (fan-out=3)           │
-  │                         │                         │
-  │◄──Heartbeat (30s)─────│◄──Heartbeat (30s)──────│
-  │                         │                         │
-  │  Message Dedup:         │                         │
-  │  GUID-based seen cache  │                         │
-  │  30-min TTL             │                         │
-  │                         │                         │
-  │  Peer Registry:         │                         │
-  │  Active peers tracked   │                         │
-  │  10-min timeout         │                         │
-```
-
-### Reputation System
-
-```
-Initial reputation: 0.5
-
-Events:
-  Confirmed threat report:  +0.05
-  False positive report:    -0.10
-  Consistent with consensus: +0.02
-
-Weighted Voting:
-  vote_weight = peer.reputation
-  consensus = Σ(vote × weight) / Σ(weight)
-  Threshold: consensus > 0.6 → accepted as threat
-```
-
----
-
-## Campaign Detection
-
-Global attack pattern recognition via graph clustering:
-
-```
-Telemetry Events
-    │
-    ▼
-┌─────────────────────────────┐
-│ Global Threat Graph          │
-│ ConcurrentDictionary-backed  │
-│                              │
-│  endpoint ──▶ process ──▶ file ──▶ domain ──▶ IP
-│     │            │          │         │        │
-│     └────────────┴──────────┴─────────┴────────┘
-│                 Bidirectional edges
-└────────┬────────────────────┘
-         │
-         ▼
-┌─────────────────────────────┐
-│ Event Correlation            │
-│ ├─ Group by shared IPs      │
-│ ├─ Group by shared hashes   │
-│ ├─ Group by shared domains  │
-│ └─ 4-hour time window       │
-└────────┬────────────────────┘
-         │
-         ▼
-┌─────────────────────────────┐
-│ Connected-Component BFS      │
-│ Clusters with >2 endpoints   │
-│ = Attack Campaign            │
-└────────┬────────────────────┘
-         │
-         ▼
-Campaign Score:
-  0.3 × endpoint_count +
-  0.3 × unique_hashes +
-  0.2 × unique_IPs +
-  0.2 × time_correlation
-```
-
----
-
-## Data Flow Diagrams
-
-### Scan Flow
-
-```
-User initiates scan
-    │
-    ▼
-ScanViewModel.StartScanAsync()
-    │
-    ├──▶ FileSystemWatcher (real-time)
-    │    or manual file/directory selection
-    │
-    ▼
-AntivirusEngine.ScanFileAsync(path)
-    │
-    ├──▶ YARA: dnYara.CompiledRules.Match(bytes)
-    ├──▶ Hash: SHA256 → KnowledgeBase.LookupHash()
-    ├──▶ Heuristic: HeuristicEngine.Analyze(path)
-    │
-    ▼
-SecurityBrain.AssessAsync(scanResult)
-    │
-    ├──▶ Behavioral analysis
-    ├──▶ Graph correlation
-    ├──▶ LLM assessment (optional)
-    ├──▶ Threat intel matching
-    │
-    ▼
-Verdict: Clean | Suspicious | Malicious
-    │
-    ├── Clean: Log result
-    ├── Suspicious: Alert + detailed report
-    └── Malicious: Quarantine + alert + EventBus publish
-```
-
-### LLM Chat Flow
-
-```
-User message → ChatViewModel
-    │
-    ▼
-AiCommandRouter.ExecuteAsync()
-    │
-    ├── /scan command  → trigger scan
-    ├── /status        → system status
-    ├── /help          → help text
-    └── chat           → LLM inference
-         │
-         ▼
-    LlmService.ChatAsync()
-         │
-         ├── Primary: LlmModelManager.IsLoaded?
-         │   └── Yes → ChatSessionManager → inference
-         │
-         └── Fallback: MultiLlmManager.GetMainEngine()
-             └── ChatSessionManager → inference
-                  │
-                  ▼
-             Token streaming → UI update
-             IAsyncEnumerable<string>
-```
-
----
-
-## Data Storage Map
-
-| Data | Location | Format | Access Pattern |
-|------|----------|--------|----------------|
-| Threat signatures | SQLite + `data/threat_signatures.json` | DB + JSON backup | Read-heavy, periodic write |
-| Chat memory | `data/llm_memory_{username}.json` | Per-user JSON | Per-session read/write |
-| Attack campaigns | `data/campaigns.json` | JSON | Periodic write, read on query |
-| Anomaly models | `data/models/anomaly_model_v{N}.json` | Serialized forest | 6-hour write, constant read |
-| Model registry | `data/models/model_registry.json` | Version tracking | Append-only |
-| YARA rules | `data/yara_rules/*.yar` | YARA syntax | Read on scan, periodic write |
-| Scan history | SQLite KnowledgeBase | Database | Append + query |
-| Settings | `data/settings.json` | JSON | Read on startup, write on change |
-| Server config | `data/server_settings.json` | JSON | Read on startup |
-| User accounts | SQLite + `data/users.json` | DB + JSON | Auth read, admin write |
+| Requirement | Server | Client |
+|-------------|--------|--------|
+| OS | Windows Server 2019+ / Ubuntu 20.04+ | Windows 10+ / Linux / Android 10+ |
+| Runtime | .NET 8.0 (bundled) | .NET 8.0 (bundled) |
+| RAM | 16GB+ recommended | 4GB minimum |
+| Storage | 100GB+ (with LLMs) | 2GB |
+| Network | Static IP recommended | Internet access |
+| GPU | Optional (LLM acceleration) | Not required |
 
 ---
 
 <p align="center">
-  <sub>Copyright (c) 2024-2026 Synthetic Game Labs. All rights reserved.</sub>
+  <sub>Copyright 2024-2026 Synthetic Game Labs. All rights reserved.</sub>
 </p>

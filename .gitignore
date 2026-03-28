@@ -1,75 +1,86 @@
-# SGL SyntheticAI .gitignore
+# SyntheticAI Public Repository
+# .gitignore — Protect all proprietary materials
+
+# ============================================
+# CRITICAL: Never commit proprietary source
+# ============================================
+/src/
+/tests/
+*.sln
+*.csproj
+/bin/
+/obj/
+/publish/
+/BetaV*/
 
 # Build outputs
-bin/
-obj/
-publish/
-*.exe.bak
+*.exe
+*.dll
+*.pdb
+*.msi
+*.apk
+
+# .NET
+*.user
+*.suo
+*.cache
+/packages/
+/TestResults/
+*.nupkg
 
 # IDE
 .vs/
 .vscode/
-*.suo
-*.user
-*.sln.docstates
+*.swp
+*.swo
+*~
 .idea/
 
-# NuGet
-packages/
-*.nupkg
-**/[Pp]ackages/**
-
-# Secrets & credentials
-*.key
-*.pem
-*.pfx
-*.p12
-.env
-.env.*
-data/jwt_secret.key
-data/registrations.log
-data/server_settings.json
-
-# User data
-data/llm_memory_*.json
-data/chat_settings.json
-data/settings.json
-data/users.json
-data/threat_signatures.json
-
-# LLM Models (too large for Git)
-LLM/
-*.gguf
-*.ggml
-*.bin
-
-# Stable Diffusion (too large)
-SDWebUi/
-Python310/
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# OS files
+# OS
 Thumbs.db
 .DS_Store
 desktop.ini
 
-# Logs
-*.log
-logs/
+# Secrets — NEVER commit
+*.env
+.env.*
+appsettings.*.json
+settings.json
+credentials.json
+*.key
+*.pem
+*.pfx
+*.p12
+serviceaccount*.json
+firebase*.json
 
-# Temporary files
-*.tmp
-*.temp
-*.swp
-*~
-
-# Server installer bin files (too large)
+# LLM Models — Too large & proprietary
+*.gguf
 *.bin
+*.safetensors
+*.pt
+*.onnx
+LLM/
+LLM_Server/
 
-# Node modules (website)
+# Data
+*.db
+*.sqlite
+*.jsonl
+/DataLake/
+/logs/
+
+# Installers and large binaries
+*.iso
+*.zip
+*.tar.gz
+*.7z
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
 node_modules/
-dist/

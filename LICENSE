@@ -1,96 +1,82 @@
-SGL SyntheticAI — Proprietary Software License
-================================================
+SYNTHETICAI PROPRIETARY LICENSE
 
-Copyright (c) 2024-2026 Synthetic Game Labs. All rights reserved.
+Copyright (c) 2024-2026 Synthetic Game Labs. All Rights Reserved.
 
-NOTICE: This software and associated documentation files (the "Software")
-are the proprietary and confidential property of Synthetic Game Labs
-("SGL"). The Software is protected by copyright law, trade secret law,
-and international treaty provisions.
+NOTICE: This repository contains documentation, architecture descriptions,
+research concepts, and demonstration code related to the SyntheticAI
+Autonomous AI Cyber Defense Platform.
 
-1. GRANT OF LICENSE
-   This repository is provided for EVALUATION AND DEMONSTRATION PURPOSES
-   ONLY. No license is granted to use, copy, modify, merge, publish,
-   distribute, sublicense, or sell copies of the Software or its source
-   code, except as expressly authorized in writing by Synthetic Game Labs.
+1. PROPRIETARY MATERIALS
 
-2. RESTRICTIONS
-   You may NOT:
-   (a) Copy, reproduce, or distribute the Software or any portion thereof;
-   (b) Reverse engineer, decompile, or disassemble the Software;
-   (c) Modify or create derivative works based on the Software;
-   (d) Remove or alter any proprietary notices, labels, or marks;
-   (e) Use the Software for any commercial purpose without a license;
-   (f) Transfer, sublicense, lease, lend, or rent the Software to any
-       third party;
-   (g) Use any portion of the Software's architecture, algorithms, or
-       implementation patterns in competing products.
+   The SyntheticAI platform, including but not limited to its detection
+   algorithms, machine learning models, threat classification logic,
+   investigation engine, campaign detection algorithms, threat graph
+   implementations, and all associated source code maintained in private
+   repositories, are the exclusive proprietary property of Synthetic Game
+   Labs.
 
-3. INTELLECTUAL PROPERTY
-   The Software embodies valuable trade secrets and proprietary technology
-   of Synthetic Game Labs, including but not limited to:
-   - Self-evolving AI threat detection architecture
-   - Autonomous malware reverse-engineering engine
-   - Self-mutating YARA rule generation algorithms
-   - Graph-based campaign detection methodology
-   - Gossip protocol with reputation-weighted voting
-   - Multi-LLM orchestration and slot management
-   - SecurityBrain composite threat scoring pipeline
-   - Isolation Forest anomaly detection implementation
+   These materials are protected by copyright law and international
+   treaties. Unauthorized reproduction, distribution, or use of these
+   materials is strictly prohibited.
 
-   All intellectual property rights in the foregoing remain exclusively
-   with Synthetic Game Labs.
+2. DEMONSTRATION CODE LICENSE
 
-4. CONFIDENTIALITY
-   The Software contains confidential and proprietary information. You
-   agree to hold the Software in confidence and not to disclose its
-   contents or any information derived therefrom to any third party
-   without prior written consent of Synthetic Game Labs.
+   Files located in the following directories of this repository are
+   provided under the MIT License for educational and evaluation purposes:
 
-5. EVALUATION LICENSE
-   Qualified investors, enterprise customers, and security researchers
-   may request an evaluation license by contacting:
-   security@syntheticgamelabs.com
+   - /examples/
+   - /demo/
+   - /sdk/sample-integrations/
 
-   Evaluation licenses are granted at the sole discretion of SGL and
-   are subject to a separate Evaluation Agreement.
+   These demonstration files may be used, copied, modified, and distributed
+   freely, subject to the MIT License terms below. These files do NOT
+   contain proprietary algorithms or production code.
 
-6. SDK AND API LICENSE
-   The SDK client libraries provided in the sdk/ directory are licensed
-   separately under the MIT License and may be freely used to build
-   integrations with authorized SGL SyntheticAI deployments. See
-   sdk/LICENSE for details.
+3. DOCUMENTATION LICENSE
 
-7. BINARY DISTRIBUTION
-   Pre-built binaries in the binaries/ directory may be downloaded and
-   installed for personal, non-commercial evaluation purposes. Commercial
-   deployment requires a separate commercial license agreement.
+   Documentation files (*.md) in the /docs/ and /research/ directories are
+   provided for informational purposes only. They may be referenced and
+   cited with attribution but may not be reproduced in full without written
+   permission from Synthetic Game Labs.
 
-8. TERMINATION
-   This license is effective until terminated. It will terminate
-   automatically without notice if you fail to comply with any term or
-   condition of this license. Upon termination, you must destroy all
-   copies of the Software in your possession.
+4. NO WARRANTY
 
-9. DISCLAIMER OF WARRANTY
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+   All materials in this repository are provided "AS IS" without warranty
+   of any kind, express or implied, including but not limited to the
+   warranties of merchantability, fitness for a particular purpose, and
+   noninfringement.
 
-10. LIMITATION OF LIABILITY
-    IN NO EVENT SHALL SYNTHETIC GAME LABS BE LIABLE FOR ANY CLAIM,
-    DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT,
-    OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE
-    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+5. LIMITATION OF LIABILITY
 
-11. GOVERNING LAW
-    This license shall be governed by and construed in accordance with
-    the laws of the United States, without regard to its conflict of
-    law provisions.
+   In no event shall Synthetic Game Labs be liable for any claim, damages,
+   or other liability arising from the use of materials in this repository.
 
-For licensing inquiries, partnership opportunities, or investment
-discussions, contact:
+6. CONTACT
 
-  Synthetic Game Labs
-  Email: security@syntheticgamelabs.com
-  Web:   https://syntheticgamelabs.com
+   For licensing inquiries, partnership proposals, or permission requests:
+
+   Email: syntheticgamelabs@gmail.com
+   Website: https://syntheticgamelabs.dpdns.org
+
+---
+
+MIT LICENSE (applicable to /examples/, /demo/, /sdk/sample-integrations/ only)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of the demonstration software and associated documentation files (the
+"Demo Software"), to deal in the Demo Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Demo Software, and to
+permit persons to whom the Demo Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Demo Software.
+
+THE DEMO SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE DEMO SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE DEMO SOFTWARE.

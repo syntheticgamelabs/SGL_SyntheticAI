@@ -1,0 +1,373 @@
+<!-- SyntheticAI Threat Universe Demo | Copyright (c) 2024-2026 Synthetic Game Labs -->
+<!-- This is a static demonstration visualization. Not connected to any production system. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SyntheticAI Threat Universe — Demo Visualization</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a1a;
+    color: #c8d6e5;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex; flex-direction: column;
+    height: 100vh; overflow: hidden;
+  }
+  /* ---------- HEADER ---------- */
+  header {
+    background: linear-gradient(90deg, #0d0d26 0%, #141435 50%, #0d0d26 100%);
+    border-bottom: 1px solid #1a3a5c;
+    padding: 14px 28px; display: flex; align-items: center; gap: 16px;
+  }
+  header .logo {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: radial-gradient(circle, #00e5ff 0%, #003d66 80%);
+    box-shadow: 0 0 12px #00e5ff55; flex-shrink: 0;
+  }
+  header h1 {
+    font-size: 1.25rem; font-weight: 600; letter-spacing: .5px;
+    background: linear-gradient(90deg, #00e5ff, #76ff03);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  header .tag {
+    font-size: .7rem; padding: 3px 10px; border-radius: 3px;
+    background: #76ff0322; color: #76ff03; border: 1px solid #76ff0344;
+    font-family: 'Consolas', 'Courier New', monospace; margin-left: auto;
+  }
+  /* ---------- STATS BAR ---------- */
+  .stats-bar {
+    display: flex; gap: 2px; padding: 0 2px;
+    background: #0e0e24; border-bottom: 1px solid #1a3a5c;
+  }
+  .stat {
+    flex: 1; text-align: center; padding: 10px 8px;
+    background: #11112a; border-left: 3px solid transparent;
+  }
+  .stat:nth-child(1) { border-color: #00e5ff; }
+  .stat:nth-child(2) { border-color: #ff1744; }
+  .stat:nth-child(3) { border-color: #ffab00; }
+  .stat:nth-child(4) { border-color: #76ff03; }
+  .stat .label {
+    font-size: .65rem; text-transform: uppercase; letter-spacing: 1px;
+    color: #6b7b8d; margin-bottom: 2px;
+  }
+  .stat .value {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 1.35rem; font-weight: 700;
+  }
+  .stat:nth-child(1) .value { color: #00e5ff; }
+  .stat:nth-child(2) .value { color: #ff1744; }
+  .stat:nth-child(3) .value { color: #ffab00; }
+  .stat:nth-child(4) .value { color: #76ff03; text-shadow: 0 0 8px #76ff0366; }
+  /* ---------- MAIN LAYOUT ---------- */
+  .main { display: flex; flex: 1; overflow: hidden; }
+  /* ---------- GRAPH AREA ---------- */
+  .graph-area {
+    flex: 1; position: relative; overflow: hidden;
+    background: radial-gradient(ellipse at center, #0f1028 0%, #0a0a1a 70%);
+  }
+  svg { width: 100%; height: 100%; display: block; }
+  /* Tooltip */
+  .tooltip {
+    position: absolute; pointer-events: none; padding: 10px 14px;
+    background: #141435ee; border: 1px solid #00e5ff88;
+    border-radius: 6px; font-size: .78rem; line-height: 1.5;
+    font-family: 'Consolas', 'Courier New', monospace;
+    color: #e0e0e0; box-shadow: 0 4px 24px #00000088;
+    opacity: 0; transition: opacity .15s;
+  }
+  .tooltip.visible { opacity: 1; }
+  /* Threat pulse animation */
+  @keyframes threatPulse {
+    0%   { filter: drop-shadow(0 0 4px #ff1744aa); }
+    50%  { filter: drop-shadow(0 0 16px #ff1744ff); }
+    100% { filter: drop-shadow(0 0 4px #ff1744aa); }
+  }
+  .threat-node { animation: threatPulse 2s ease-in-out infinite; }
+  /* ---------- SIDEBAR ---------- */
+  .sidebar {
+    width: 300px; flex-shrink: 0;
+    background: #0e0e24; border-left: 1px solid #1a3a5c;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .sidebar h2 {
+    font-size: .8rem; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 16px 18px 12px; color: #ff1744;
+    border-bottom: 1px solid #1a3a5c;
+  }
+  .alert-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .alert-item {
+    padding: 12px 18px; border-bottom: 1px solid #1a1a3a;
+    transition: background .2s;
+  }
+  .alert-item:hover { background: #1a1a3a; }
+  .alert-time {
+    font-size: .65rem; color: #4a5a6a;
+    font-family: 'Consolas', 'Courier New', monospace;
+  }
+  .alert-sev {
+    display: inline-block; font-size: .6rem; padding: 1px 6px;
+    border-radius: 2px; margin-left: 6px; font-weight: 700;
+  }
+  .sev-critical { background: #ff174433; color: #ff1744; }
+  .sev-high     { background: #ffab0033; color: #ffab00; }
+  .sev-medium   { background: #00e5ff22; color: #00e5ff; }
+  .alert-msg {
+    font-size: .78rem; margin-top: 4px; color: #b0bec5; line-height: 1.4;
+  }
+  /* Legend */
+  .legend {
+    padding: 14px 18px; border-top: 1px solid #1a3a5c;
+  }
+  .legend h3 {
+    font-size: .7rem; text-transform: uppercase; letter-spacing: 1px;
+    color: #6b7b8d; margin-bottom: 8px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: .75rem; }
+  .legend-icon { width: 14px; height: 14px; flex-shrink: 0; }
+  /* ---------- FOOTER ---------- */
+  footer {
+    background: #0a0a18; border-top: 1px solid #1a3a5c;
+    text-align: center; padding: 8px 16px;
+    font-size: .65rem; color: #3a4a5a;
+    font-family: 'Consolas', 'Courier New', monospace;
+  }
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header>
+  <div class="logo"></div>
+  <h1>SyntheticAI Threat Universe &mdash; Demo Visualization</h1>
+  <span class="tag">DEMO MODE</span>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat"><div class="label">Devices Online</div><div class="value">12</div></div>
+  <div class="stat"><div class="label">Active Threats</div><div class="value">5</div></div>
+  <div class="stat"><div class="label">Threat Connections</div><div class="value">23</div></div>
+  <div class="stat"><div class="label">Risk Level</div><div class="value">ELEVATED</div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="graph-area">
+    <svg id="graph"></svg>
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>Recent Alerts</h2>
+    <div class="alert-list" id="alerts"></div>
+    <div class="legend">
+      <h3>Node Legend</h3>
+      <div class="legend-item">
+        <svg class="legend-icon" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#2196f3"/></svg>
+        <span>Device</span>
+      </div>
+      <div class="legend-item">
+        <svg class="legend-icon" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" fill="#4caf50"/></svg>
+        <span>Process</span>
+      </div>
+      <div class="legend-item">
+        <svg class="legend-icon" viewBox="0 0 14 14"><polygon points="7,1 13,13 1,13" fill="#ff1744"/></svg>
+        <span>Threat</span>
+      </div>
+      <div class="legend-item">
+        <svg class="legend-icon" viewBox="0 0 14 14"><polygon points="7,0 14,7 7,14 0,7" fill="#ffab00"/></svg>
+        <span>External IP</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>SyntheticAI Demo Visualization &nbsp;|&nbsp; Synthetic Game Labs &nbsp;|&nbsp; Not connected to production system</footer>
+
+<script>
+/* ================================================================
+   DATA — demo nodes & edges
+   ================================================================ */
+const nodes = [
+  { id: "Device-1",  type: "device",  label: "Workstation-A",    detail: "Win 11 | 192.168.1.10" },
+  { id: "Device-2",  type: "device",  label: "Server-DB",        detail: "Ubuntu 22 | 10.0.0.5" },
+  { id: "Device-3",  type: "device",  label: "Laptop-Eng",       detail: "macOS 14 | 192.168.1.22" },
+  { id: "Device-4",  type: "device",  label: "Build-Server",     detail: "Debian 12 | 10.0.0.12" },
+  { id: "Device-5",  type: "device",  label: "IoT-Gateway",      detail: "Linux | 10.0.0.50" },
+  { id: "Proc-1",   type: "process", label: "powershell.exe",   detail: "PID 4821 on Device-1" },
+  { id: "Proc-2",   type: "process", label: "sshd",             detail: "PID 1122 on Device-2" },
+  { id: "Proc-3",   type: "process", label: "node",             detail: "PID 3390 on Device-4" },
+  { id: "Proc-4",   type: "process", label: "python3",          detail: "PID 8812 on Device-3" },
+  { id: "Threat-1", type: "threat",  label: "Cobalt Strike",    detail: "Beacon payload detected" },
+  { id: "Threat-2", type: "threat",  label: "Mimikatz",         detail: "Credential dump attempt" },
+  { id: "Threat-3", type: "threat",  label: "Reverse Shell",    detail: "Outbound TCP 4444" },
+  { id: "Threat-4", type: "threat",  label: "Ransomware Stager",detail: "Encrypted dropper binary" },
+  { id: "Threat-5", type: "threat",  label: "DNS Tunnel",       detail: "Exfil via DNS TXT records" },
+  { id: "IP-1",     type: "ip",      label: "45.33.12.7",       detail: "Known C2 server — RU" },
+  { id: "IP-2",     type: "ip",      label: "185.220.101.3",    detail: "Tor exit node — DE" },
+  { id: "IP-3",     type: "ip",      label: "91.215.85.22",     detail: "Malware distribution — CN" },
+  { id: "IP-4",     type: "ip",      label: "23.106.215.66",    detail: "Phishing infra — US" },
+];
+
+const links = [
+  { source: "Device-1", target: "Proc-1",   color: "#2196f388" },
+  { source: "Device-2", target: "Proc-2",   color: "#2196f388" },
+  { source: "Device-4", target: "Proc-3",   color: "#2196f388" },
+  { source: "Device-3", target: "Proc-4",   color: "#2196f388" },
+  { source: "Proc-1",   target: "Threat-1", color: "#ff174488" },
+  { source: "Proc-1",   target: "Threat-2", color: "#ff174488" },
+  { source: "Proc-2",   target: "Threat-3", color: "#ff174488" },
+  { source: "Proc-4",   target: "Threat-5", color: "#ff174488" },
+  { source: "Device-5", target: "Threat-4", color: "#ff174488" },
+  { source: "Threat-1", target: "IP-1",     color: "#ffab0088" },
+  { source: "Threat-3", target: "IP-2",     color: "#ffab0088" },
+  { source: "Threat-4", target: "IP-3",     color: "#ffab0088" },
+  { source: "Threat-5", target: "IP-4",     color: "#ffab0088" },
+  { source: "Threat-2", target: "IP-1",     color: "#ffab0088" },
+  { source: "Device-1", target: "Device-2", color: "#ffffff18" },
+  { source: "Device-2", target: "Device-4", color: "#ffffff18" },
+  { source: "Device-3", target: "Device-1", color: "#ffffff18" },
+  { source: "Device-4", target: "Device-5", color: "#ffffff18" },
+  { source: "IP-1",     target: "IP-2",     color: "#ffab0044" },
+  { source: "Device-3", target: "Proc-1",   color: "#4caf5044" },
+  { source: "Proc-3",   target: "Threat-1", color: "#ff174444" },
+  { source: "Threat-2", target: "Device-2", color: "#ff174444" },
+  { source: "Threat-5", target: "IP-1",     color: "#ffab0066" },
+];
+
+/* Alerts */
+const alerts = [
+  { time: "14:32:07", sev: "critical", msg: "Suspicious PowerShell activity on Device-3 — encoded command execution" },
+  { time: "14:31:44", sev: "critical", msg: "C2 beacon detected to 45.33.12.7 from Workstation-A" },
+  { time: "14:30:19", sev: "high",     msg: "Mimikatz credential dump attempt on Server-DB via lateral movement" },
+  { time: "14:28:55", sev: "high",     msg: "Ransomware stager binary dropped on IoT-Gateway — encrypted payload" },
+  { time: "14:27:03", sev: "medium",   msg: "DNS tunneling exfiltration detected — 1.2 MB via TXT records to 23.106.215.66" },
+];
+
+const alertList = document.getElementById("alerts");
+alerts.forEach(a => {
+  const el = document.createElement("div");
+  el.className = "alert-item";
+  el.innerHTML = `<span class="alert-time">${a.time}</span><span class="alert-sev sev-${a.sev}">${a.sev.toUpperCase()}</span><div class="alert-msg">${a.msg}</div>`;
+  alertList.appendChild(el);
+});
+
+/* ================================================================
+   D3 FORCE GRAPH
+   ================================================================ */
+const svg = d3.select("#graph");
+const container = svg.append("g");
+const tooltip = document.getElementById("tooltip");
+
+/* Zoom */
+svg.call(d3.zoom().scaleExtent([0.3, 4]).on("zoom", e => container.attr("transform", e.transform)));
+
+/* Defs — glow filters */
+const defs = svg.append("defs");
+const glowFilter = defs.append("filter").attr("id","glow");
+glowFilter.append("feGaussianBlur").attr("stdDeviation","4").attr("result","blur");
+const merge = glowFilter.append("feMerge");
+merge.append("feMergeNode").attr("in","blur");
+merge.append("feMergeNode").attr("in","SourceGraphic");
+
+/* Simulation */
+const width = window.innerWidth - 300;
+const height = window.innerHeight - 160;
+
+const simulation = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+  .force("charge", d3.forceManyBody().strength(-320))
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("collision", d3.forceCollide(30));
+
+/* Links */
+const linkEls = container.selectAll("line")
+  .data(links).enter().append("line")
+  .attr("stroke", d => d.color)
+  .attr("stroke-width", 1.5);
+
+/* Node groups */
+const nodeEls = container.selectAll(".node")
+  .data(nodes).enter().append("g")
+  .attr("class", d => d.type === "threat" ? "node threat-node" : "node")
+  .attr("filter", d => d.type === "threat" ? "" : "url(#glow)")
+  .call(d3.drag()
+    .on("start", (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on("end", (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
+  );
+
+/* Shape helpers */
+const sz = 10;
+nodeEls.each(function(d) {
+  const g = d3.select(this);
+  switch (d.type) {
+    case "device":
+      g.append("circle").attr("r", sz).attr("fill", "#2196f3").attr("stroke", "#64b5f6").attr("stroke-width", 1.5);
+      break;
+    case "process":
+      g.append("rect").attr("x", -sz).attr("y", -sz).attr("width", sz * 2).attr("height", sz * 2)
+        .attr("rx", 3).attr("fill", "#4caf50").attr("stroke", "#81c784").attr("stroke-width", 1.5);
+      break;
+    case "threat":
+      g.append("polygon").attr("points", `0,${-sz - 2} ${sz + 2},${sz + 2} ${-sz - 2},${sz + 2}`)
+        .attr("fill", "#ff1744").attr("stroke", "#ff5252").attr("stroke-width", 1.5);
+      break;
+    case "ip":
+      g.append("polygon").attr("points", `0,${-sz - 2} ${sz + 2},0 0,${sz + 2} ${-sz - 2},0`)
+        .attr("fill", "#ffab00").attr("stroke", "#ffd740").attr("stroke-width", 1.5);
+      break;
+  }
+});
+
+/* Labels */
+nodeEls.append("text")
+  .attr("dy", sz + 16).attr("text-anchor", "middle")
+  .attr("fill", "#8899aa").attr("font-size", "9px")
+  .attr("font-family", "'Consolas','Courier New',monospace")
+  .text(d => d.label);
+
+/* Tooltip */
+nodeEls
+  .on("mouseover", (e, d) => {
+    tooltip.innerHTML = `<strong style="color:${colorFor(d.type)}">${d.label}</strong><br>${d.detail}<br><span style="color:#6b7b8d">Type: ${d.type}</span>`;
+    tooltip.classList.add("visible");
+  })
+  .on("mousemove", e => {
+    const r = document.querySelector(".graph-area").getBoundingClientRect();
+    tooltip.style.left = (e.clientX - r.left + 14) + "px";
+    tooltip.style.top = (e.clientY - r.top - 10) + "px";
+  })
+  .on("mouseout", () => tooltip.classList.remove("visible"));
+
+function colorFor(type) {
+  return { device: "#2196f3", process: "#4caf50", threat: "#ff1744", ip: "#ffab00" }[type] || "#ccc";
+}
+
+/* Tick */
+simulation.on("tick", () => {
+  linkEls.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+         .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+  nodeEls.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+/* Particle background — subtle stars */
+(function drawStars() {
+  const bg = container.insert("g", ":first-child");
+  for (let i = 0; i < 120; i++) {
+    bg.append("circle")
+      .attr("cx", Math.random() * width * 1.4 - width * 0.2)
+      .attr("cy", Math.random() * height * 1.4 - height * 0.2)
+      .attr("r", Math.random() * 1.2 + 0.2)
+      .attr("fill", "#ffffff")
+      .attr("opacity", Math.random() * 0.25 + 0.03);
+  }
+})();
+</script>
+</body>
+</html>

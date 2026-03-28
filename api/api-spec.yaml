@@ -1,0 +1,934 @@
+# SyntheticAI Platform API Specification
+# Copyright 2024-2026 Synthetic Game Labs. All rights reserved.
+#
+# This specification is provided for integration and evaluation purposes.
+# It documents the public REST surface of the SyntheticAI platform.
+
+openapi: "3.0.3"
+info:
+  title: SyntheticAI Platform API
+  description: |
+    REST API for the SyntheticAI threat-intelligence and endpoint-protection
+    platform by Synthetic Game Labs. Provides telemetry ingestion, threat
+    detection, investigation workflows, data-lake queries, and notification
+    management.
+  version: "1.0.0"
+  contact:
+    name: Synthetic Game Labs Platform Engineering
+    email: platform@syntheticgamelabs.com
+  license:
+    name: Proprietary
+    url: https://syntheticgamelabs.com/legal/api-license
+
+servers:
+  - url: https://api.syntheticai.syntheticgamelabs.com/v1
+    description: Production
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Auth
+    description: Authentication and token management
+  - name: Telemetry
+    description: Endpoint telemetry ingestion
+  - name: Threats
+    description: Threat detection and listing
+  - name: DataLake
+    description: Historical threat-intelligence queries
+  - name: Investigate
+    description: Automated investigation workflows
+  - name: Universe
+    description: Threat-universe graph exploration
+  - name: Notifications
+    description: Alert delivery configuration
+  - name: System
+    description: Platform health and metadata
+
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+paths:
+
+  # --- Auth ----------------------------------------------------------------
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate and obtain a JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh an expired access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        "200":
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new API consumer
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Account created
+        "409":
+          description: Account already exists
+
+  # --- Telemetry -----------------------------------------------------------
+  /api/telemetry/submit:
+    post:
+      tags: [Telemetry]
+      summary: Submit a single telemetry event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelemetryEvent"
+      responses:
+        "202":
+          description: Event accepted for processing
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/telemetry/batch:
+    post:
+      tags: [Telemetry]
+      summary: Submit a batch of telemetry events (max 500)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [events]
+              properties:
+                events:
+                  type: array
+                  maxItems: 500
+                  items:
+                    $ref: "#/components/schemas/TelemetryEvent"
+      responses:
+        "202":
+          description: Batch accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/telemetry/status:
+    get:
+      tags: [Telemetry]
+      summary: Check ingestion pipeline status
+      responses:
+        "200":
+          description: Pipeline status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queue_depth:
+                    type: integer
+                  events_per_second:
+                    type: number
+                  status:
+                    type: string
+                    enum: [healthy, degraded, down]
+
+  # --- Threats -------------------------------------------------------------
+  /api/threats:
+    get:
+      tags: [Threats]
+      summary: List detected threats
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Paginated threat list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThreatList"
+
+  /api/threats/{threat_id}:
+    get:
+      tags: [Threats]
+      summary: Retrieve a specific threat by ID
+      parameters:
+        - name: threat_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Threat details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Threat"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/threats/by-severity/{level}:
+    get:
+      tags: [Threats]
+      summary: List threats filtered by severity level
+      parameters:
+        - name: level
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+      responses:
+        "200":
+          description: Filtered threat list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThreatList"
+
+  # --- DataLake ------------------------------------------------------------
+  /api/datalake/query/hash:
+    get:
+      tags: [DataLake]
+      summary: Look up a file hash in the threat data lake
+      parameters:
+        - name: sha256
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Hash intelligence
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataLakeResult"
+
+  /api/datalake/query/ip:
+    get:
+      tags: [DataLake]
+      summary: Look up an IP address in the threat data lake
+      parameters:
+        - name: ip
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: IP intelligence
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataLakeResult"
+
+  /api/datalake/query/host:
+    get:
+      tags: [DataLake]
+      summary: Look up a hostname or domain
+      parameters:
+        - name: host
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Host intelligence
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataLakeResult"
+
+  /api/datalake/timeline:
+    get:
+      tags: [DataLake]
+      summary: Retrieve event timeline for an indicator
+      parameters:
+        - name: indicator
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: Timeline data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  indicator:
+                    type: string
+                  events:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TimelineEntry"
+
+  /api/datalake/campaigns:
+    get:
+      tags: [DataLake]
+      summary: List identified threat campaigns
+      responses:
+        "200":
+          description: Campaign list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaigns:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Campaign"
+
+  /api/datalake/hunt:
+    post:
+      tags: [DataLake]
+      summary: Execute a threat-hunting query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query:
+                  type: string
+                  description: Hunt query in SyntheticAI Query Language (SaQL)
+                max_results:
+                  type: integer
+                  default: 100
+      responses:
+        "200":
+          description: Hunt results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TelemetryEvent"
+                  total:
+                    type: integer
+
+  # --- Investigate ---------------------------------------------------------
+  /api/investigate:
+    post:
+      tags: [Investigate]
+      summary: Start an automated investigation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [threat_id]
+              properties:
+                threat_id:
+                  type: string
+                scope:
+                  type: string
+                  enum: [quick, full]
+                  default: quick
+      responses:
+        "201":
+          description: Investigation started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  investigation_id:
+                    type: string
+                  status:
+                    type: string
+
+  /api/investigate/{investigation_id}/status:
+    get:
+      tags: [Investigate]
+      summary: Check investigation progress
+      parameters:
+        - name: investigation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Investigation status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  investigation_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [running, completed, failed]
+                  progress_pct:
+                    type: integer
+
+  /api/investigate/{investigation_id}/report:
+    get:
+      tags: [Investigate]
+      summary: Retrieve the final investigation report
+      parameters:
+        - name: investigation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Investigation report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvestigationReport"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # --- Universe ------------------------------------------------------------
+  /api/universe/snapshot:
+    get:
+      tags: [Universe]
+      summary: Retrieve current threat-universe graph snapshot
+      responses:
+        "200":
+          description: Graph snapshot metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  snapshot_id:
+                    type: string
+                  node_count:
+                    type: integer
+                  edge_count:
+                    type: integer
+                  generated_at:
+                    type: string
+                    format: date-time
+
+  /api/universe/nodes:
+    get:
+      tags: [Universe]
+      summary: Query nodes in the threat-universe graph
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [device, process, file, network, user]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Node list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nodes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        label:
+                          type: string
+                        threat_score:
+                          type: number
+
+  /api/universe/paths:
+    get:
+      tags: [Universe]
+      summary: Find attack paths between two nodes
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Computed paths
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paths:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        hops:
+                          type: array
+                          items:
+                            type: string
+                        risk_score:
+                          type: number
+
+  # --- Notifications -------------------------------------------------------
+  /api/notifications/register:
+    post:
+      tags: [Notifications]
+      summary: Register a notification channel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, target]
+              properties:
+                type:
+                  type: string
+                  enum: [webhook, email, slack, teams]
+                target:
+                  type: string
+                  description: URL or email address
+                min_severity:
+                  type: string
+                  enum: [low, medium, high, critical]
+                  default: high
+      responses:
+        "201":
+          description: Channel registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channel_id:
+                    type: string
+
+  /api/notifications/send:
+    post:
+      tags: [Notifications]
+      summary: Send a test notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [channel_id]
+              properties:
+                channel_id:
+                  type: string
+      responses:
+        "200":
+          description: Test notification sent
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # --- System --------------------------------------------------------------
+  /api/system/health:
+    get:
+      tags: [System]
+      summary: Platform health check
+      security: []
+      responses:
+        "200":
+          description: Platform is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded, down]
+                  uptime_seconds:
+                    type: integer
+
+  /api/system/version:
+    get:
+      tags: [System]
+      summary: Retrieve platform version information
+      security: []
+      responses:
+        "200":
+          description: Version info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  build:
+                    type: string
+                  api_version:
+                    type: string
+
+  /api/system/config:
+    get:
+      tags: [System]
+      summary: Retrieve non-sensitive platform configuration
+      responses:
+        "200":
+          description: Public configuration values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  telemetry_batch_max:
+                    type: integer
+                  retention_days:
+                    type: integer
+                  supported_event_types:
+                    type: array
+                    items:
+                      type: string
+
+# ---------------------------------------------------------------------------
+# Components
+# ---------------------------------------------------------------------------
+components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained via /api/auth/login
+
+  responses:
+    BadRequest:
+      description: Invalid request payload
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Authentication required or token invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Requested resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+
+    RegisterRequest:
+      type: object
+      required: [username, password, organization]
+      properties:
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        organization:
+          type: string
+
+    TokenPair:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+        token_type:
+          type: string
+          example: Bearer
+
+    TelemetryEvent:
+      type: object
+      required: [device_id, timestamp, event_type]
+      properties:
+        device_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+          enum:
+            - process_start
+            - process_end
+            - file_create
+            - file_modify
+            - file_delete
+            - network_connect
+            - network_dns
+            - registry_modify
+        process_name:
+          type: string
+        parent_process:
+          type: string
+        file_hash:
+          type: string
+        file_path:
+          type: string
+        source_ip:
+          type: string
+        destination_ip:
+          type: string
+        destination_port:
+          type: integer
+        dns_query:
+          type: string
+        registry_path:
+          type: string
+        registry_value:
+          type: string
+        user_name:
+          type: string
+        command_line:
+          type: string
+        threat_score:
+          type: number
+          minimum: 0.0
+          maximum: 1.0
+        mitre_tactic:
+          type: string
+        mitre_technique:
+          type: string
+
+    BatchResult:
+      type: object
+      properties:
+        batch_id:
+          type: string
+        accepted:
+          type: integer
+        rejected:
+          type: integer
+
+    Threat:
+      type: object
+      properties:
+        id:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        title:
+          type: string
+        mitre_tactic:
+          type: string
+        mitre_technique:
+          type: string
+        first_seen:
+          type: string
+          format: date-time
+        last_seen:
+          type: string
+          format: date-time
+        device_count:
+          type: integer
+        status:
+          type: string
+          enum: [open, investigating, resolved]
+
+    ThreatList:
+      type: object
+      properties:
+        threats:
+          type: array
+          items:
+            $ref: "#/components/schemas/Threat"
+        total:
+          type: integer
+        page:
+          type: integer
+
+    DataLakeResult:
+      type: object
+      properties:
+        indicator:
+          type: string
+        indicator_type:
+          type: string
+        first_seen:
+          type: string
+          format: date-time
+        last_seen:
+          type: string
+          format: date-time
+        threat_score:
+          type: number
+        associated_campaigns:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    TimelineEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+        summary:
+          type: string
+
+    Campaign:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        threat_count:
+          type: integer
+        status:
+          type: string
+          enum: [active, dormant, resolved]
+        first_seen:
+          type: string
+          format: date-time
+
+    InvestigationReport:
+      type: object
+      properties:
+        investigation_id:
+          type: string
+        threat_id:
+          type: string
+        status:
+          type: string
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        findings:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              description:
+                type: string
+              severity:
+                type: string
+        recommendations:
+          type: array
+          items:
+            type: string
